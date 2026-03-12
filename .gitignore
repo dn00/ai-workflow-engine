@@ -48,3 +48,8 @@ htmlcov/
 # Process artifacts
 _process/
 
+# Agent config (local only)
+CLAUDE.md
+GEMINI.md
+AGENTS.md
+
