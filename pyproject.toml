@@ -27,6 +27,7 @@ include = ["app*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = ["cli: marks tests requiring claude CLI in PATH (deselect with '-m not cli')"]
 
 [tool.ruff]
 target-version = "py311"
