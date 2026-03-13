@@ -18,11 +18,14 @@ from app.core.models import (
 )
 from app.core.projections import ReducerError, RunProjection, reduce_events
 from app.core.replay import ReplayResult, replay_run
+from app.core.runners import AbstractRunner, LocalRunner, RunResult, RunnerError
 
 __all__ = [
+    "AbstractRunner",
     "ActorType",
     "Event",
     "EventType",
+    "LocalRunner",
     "ReasonCode",
     "ReducerError",
     "ReplayResult",
@@ -32,7 +35,9 @@ __all__ = [
     "Run",
     "RunMode",
     "RunProjection",
+    "RunResult",
     "RunStatus",
+    "RunnerError",
     "ValidatedDecision",
     "VersionInfo",
     "reduce_events",
