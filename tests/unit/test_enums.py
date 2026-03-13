@@ -59,24 +59,18 @@ class TestTask001AC2EventTypeHas12Values:
         assert {m.value for m in EventType} == expected
 
 
-class TestTask001AC3ReasonCodeHas10Values:
-    """Task001 AC-3 test_reason_code_has_10_values"""
+class TestTask001AC1CoreReasonCodeHas4Values:
+    """Task001 AC-1 test_core_reason_code_has_4_values"""
 
-    def test_reason_code_has_10_values(self) -> None:
-        assert len(ReasonCode) == 10
+    def test_core_reason_code_has_4_values(self) -> None:
+        assert len(ReasonCode) == 4
 
-    def test_reason_code_exact_values(self) -> None:
+    def test_core_reason_code_exact_values(self) -> None:
         expected = {
-            "missing_manager_name",
-            "high_urgency",
-            "too_many_systems",
-            "unknown_system",
-            "forbidden_system",
             "malformed_date",
             "malformed_proposal",
             "ambiguous_normalization",
             "unsupported_request_type",
-            "manager_approval_unverified",
         }
         assert {m.value for m in ReasonCode} == expected
 

@@ -56,18 +56,16 @@ class ActorType(StrEnum):
 
 
 class ReasonCode(StrEnum):
-    """Policy gate reason codes (spec §20 — 10 values)."""
+    """Generic policy gate reason codes (spec §20 — 4 generic values).
 
-    MISSING_MANAGER_NAME = "missing_manager_name"
-    HIGH_URGENCY = "high_urgency"
-    TOO_MANY_SYSTEMS = "too_many_systems"
-    UNKNOWN_SYSTEM = "unknown_system"
-    FORBIDDEN_SYSTEM = "forbidden_system"
+    Workflow-specific reason codes live in their workflow module
+    (e.g. app.workflows.access_request.reason_codes).
+    """
+
     MALFORMED_DATE = "malformed_date"
     MALFORMED_PROPOSAL = "malformed_proposal"
     AMBIGUOUS_NORMALIZATION = "ambiguous_normalization"
     UNSUPPORTED_REQUEST_TYPE = "unsupported_request_type"
-    MANAGER_APPROVAL_UNVERIFIED = "manager_approval_unverified"
 
 
 class ReviewDecision(StrEnum):

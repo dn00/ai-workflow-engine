@@ -13,7 +13,6 @@ from app.core.enums import (
 )
 from app.core.models import (
     Event,
-    NormalizedFields,
     ReviewTask,
     Run,
     ValidatedDecision,
@@ -81,20 +80,20 @@ class TestTask002AC4ValidatedDecisionSample:
         d = ValidatedDecision(
             status="review_required",
             reason_codes=[
-                ReasonCode.MANAGER_APPROVAL_UNVERIFIED,
-                ReasonCode.HIGH_URGENCY,
+                "manager_approval_unverified",
+                "high_urgency",
             ],
-            normalized_fields=NormalizedFields(
-                employee_name="Jane Doe",
-                systems_requested=["salesforce", "looker"],
-                manager_name="Sarah Kim",
-            ),
+            normalized_fields={
+                "employee_name": "Jane Doe",
+                "systems_requested": ["salesforce", "looker"],
+                "manager_name": "Sarah Kim",
+            },
             allowed_actions=["create_review_task"],
         )
         assert d.status == "review_required"
         assert len(d.reason_codes) == 2
-        assert d.reason_codes[0] == ReasonCode.MANAGER_APPROVAL_UNVERIFIED
-        assert d.normalized_fields.employee_name == "Jane Doe"
+        assert d.reason_codes[0] == "manager_approval_unverified"
+        assert d.normalized_fields["employee_name"] == "Jane Doe"
         assert d.allowed_actions == ["create_review_task"]
 
 
@@ -147,3 +146,40 @@ class TestTask002ERR1EventMissingRequiredField:
             )
         error_text = str(exc_info.value)
         assert "run_id" in error_text
+
+
+class TestTask001AC4ValidatedDecisionGenericTypes:
+    """Task001 AC-4 test_validated_decision_generic_types"""
+
+    def test_accepts_string_reason_codes_and_dict(self) -> None:
+        d = ValidatedDecision(
+            status="approved",
+            reason_codes=["custom_reason_1", "custom_reason_2"],
+            normalized_fields={"some_field": "value", "count": 42},
+            allowed_actions=["do_something"],
+        )
+        assert d.reason_codes == ["custom_reason_1", "custom_reason_2"]
+        assert d.normalized_fields == {"some_field": "value", "count": 42}
+
+    def test_accepts_empty_reason_codes_and_fields(self) -> None:
+        d = ValidatedDecision(
+            status="validated",
+            reason_codes=[],
+            normalized_fields={},
+            allowed_actions=[],
+        )
+        assert d.reason_codes == []
+        assert d.normalized_fields == {}
+
+
+class TestTask001EC2StrEnumAcceptedAsStr:
+    """Task001 EC-2 test_strenum_accepted_as_str"""
+
+    def test_strenum_in_reason_codes(self) -> None:
+        d = ValidatedDecision(
+            status="validated",
+            reason_codes=[ReasonCode.MALFORMED_DATE],
+            normalized_fields={},
+            allowed_actions=[],
+        )
+        assert d.reason_codes[0] == "malformed_date"

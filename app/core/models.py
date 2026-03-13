@@ -11,7 +11,6 @@ from pydantic import BaseModel, Field
 from app.core.enums import (
     ActorType,
     EventType,
-    ReasonCode,
     ReviewDecision,
     ReviewStatus,
     RunMode,
@@ -27,20 +26,17 @@ class VersionInfo(BaseModel):
     policy_version: str = "1.0"
 
 
-class NormalizedFields(BaseModel):
-    """Normalized fields from proposal validation (spec §14)."""
-
-    employee_name: str
-    systems_requested: list[str]
-    manager_name: str | None = None
-
-
 class ValidatedDecision(BaseModel):
-    """Policy gate output (spec §14)."""
+    """Policy gate output (spec §14).
+
+    Uses generic types so core stays workflow-agnostic.
+    Workflow-specific NormalizedFields can be passed via .model_dump().
+    StrEnum reason codes are accepted via str subclass coercion.
+    """
 
     status: str
-    reason_codes: list[ReasonCode]
-    normalized_fields: NormalizedFields
+    reason_codes: list[str]
+    normalized_fields: dict
     allowed_actions: list[str]
 
 

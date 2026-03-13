@@ -11,7 +11,6 @@ from app.core.enums import (
 )
 from app.core.models import (
     Event,
-    NormalizedFields,
     ReviewTask,
     Run,
     ValidatedDecision,
@@ -22,7 +21,6 @@ __all__ = [
     "ActorType",
     "Event",
     "EventType",
-    "NormalizedFields",
     "ReasonCode",
     "ReviewDecision",
     "ReviewStatus",
