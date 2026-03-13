@@ -12,6 +12,7 @@ from app.workflows.access_request.allowlist import (
 )
 from app.workflows.access_request.normalize import normalize_proposal
 from app.workflows.access_request.parse import ParseResult, parse_proposal
+from app.workflows.access_request.policy import evaluate_policy
 from app.workflows.access_request.reason_codes import AccessRequestReasonCode
 from app.workflows.access_request.schema import NormalizedFields, Proposal
 from app.workflows.access_request.validate import (
@@ -29,6 +30,7 @@ __all__ = [
     "Proposal",
     "ValidationResult",
     "classify_system",
+    "evaluate_policy",
     "normalize_proposal",
     "parse_proposal",
     "validate_proposal",

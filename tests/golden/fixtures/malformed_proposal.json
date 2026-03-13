@@ -1,0 +1,9 @@
+{
+  "name": "malformed_proposal_parse_failure",
+  "input_raw": "not valid json {{{",
+  "expected_parse": {
+    "success": false,
+    "proposal": null,
+    "error_contains": "JSON parse error"
+  }
+}

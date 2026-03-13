@@ -1,0 +1,18 @@
+{
+  "name": "rejected_forbidden_system",
+  "input": {
+    "request_type": "access_request",
+    "employee_name": "Jane Doe",
+    "systems_requested": ["admin_console"],
+    "manager_name": "Sarah Kim",
+    "start_date": "2026-03-15",
+    "urgency": "standard",
+    "justification": "Need admin access",
+    "recommended_action": "approve"
+  },
+  "expected_decision": {
+    "status": "rejected",
+    "reason_codes": ["forbidden_system"],
+    "allowed_actions": []
+  }
+}

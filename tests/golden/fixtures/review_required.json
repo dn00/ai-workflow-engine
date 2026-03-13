@@ -1,0 +1,18 @@
+{
+  "name": "review_required_high_urgency",
+  "input": {
+    "request_type": "access_request",
+    "employee_name": "John Smith",
+    "systems_requested": ["salesforce", "jira"],
+    "manager_name": "Sarah Kim",
+    "start_date": "2026-03-15",
+    "urgency": "high",
+    "justification": "Urgent project deadline",
+    "recommended_action": "review"
+  },
+  "expected_decision": {
+    "status": "review_required",
+    "reason_codes": ["high_urgency"],
+    "allowed_actions": ["create_review_task"]
+  }
+}
