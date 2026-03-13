@@ -17,6 +17,7 @@ from app.core.models import (
     VersionInfo,
 )
 from app.core.projections import ReducerError, RunProjection, reduce_events
+from app.core.replay import ReplayResult, replay_run
 
 __all__ = [
     "ActorType",
@@ -24,6 +25,7 @@ __all__ = [
     "EventType",
     "ReasonCode",
     "ReducerError",
+    "ReplayResult",
     "ReviewDecision",
     "ReviewStatus",
     "ReviewTask",
@@ -34,4 +36,5 @@ __all__ = [
     "ValidatedDecision",
     "VersionInfo",
     "reduce_events",
+    "replay_run",
 ]
