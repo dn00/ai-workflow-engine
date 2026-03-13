@@ -2,12 +2,19 @@
 
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.db.models import Base
 
 
 def get_engine(url: str = "sqlite:///data/workflow.db") -> Engine:
     """Create a SQLAlchemy engine for the given database URL."""
+    if ":memory:" in url:
+        return create_engine(
+            url,
+            poolclass=StaticPool,
+            connect_args={"check_same_thread": False},
+        )
     return create_engine(url)
 
 
