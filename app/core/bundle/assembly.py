@@ -1,0 +1,36 @@
+"""Bundle assembly logic (Feature 015, Spec §25, INV-6.2)."""
+
+from datetime import datetime, timezone
+
+from app.core.bundle.models import BundleError, ReplayBundle
+from app.db.repositories.base import (
+    AbstractEventRepository,
+    AbstractReceiptRepository,
+    AbstractRunRepository,
+)
+
+
+def assemble_bundle(
+    run_id: str,
+    run_repo: AbstractRunRepository,
+    event_repo: AbstractEventRepository,
+    receipt_repo: AbstractReceiptRepository,
+) -> ReplayBundle:
+    """Assemble a replay bundle from DB state (INV-6.2)."""
+    run = run_repo.get(run_id)
+    if run is None:
+        raise BundleError(f"Run not found: {run_id}")
+
+    events = event_repo.list_by_run(run_id)
+    if not events:
+        raise BundleError(f"No events found for run: {run_id}")
+
+    receipt = receipt_repo.get_by_run(run_id)
+
+    return ReplayBundle(
+        exported_at=datetime.now(timezone.utc),
+        run=run,
+        events=events,
+        receipt=receipt,
+        projection=run.current_projection,
+    )

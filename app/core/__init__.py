@@ -1,5 +1,6 @@
 """Core domain types for the AI Workflow Engine."""
 
+from app.core.bundle import BundleError, ReplayBundle, assemble_bundle
 from app.core.enums import (
     ActorType,
     EventType,
@@ -23,11 +24,13 @@ from app.core.runners import AbstractRunner, LocalRunner, RunResult, RunnerError
 __all__ = [
     "AbstractRunner",
     "ActorType",
+    "BundleError",
     "Event",
     "EventType",
     "LocalRunner",
     "ReasonCode",
     "ReducerError",
+    "ReplayBundle",
     "ReplayResult",
     "ReviewDecision",
     "ReviewStatus",
@@ -40,6 +43,7 @@ __all__ = [
     "RunnerError",
     "ValidatedDecision",
     "VersionInfo",
+    "assemble_bundle",
     "reduce_events",
     "replay_run",
 ]
