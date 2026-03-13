@@ -23,7 +23,9 @@ from app.db import (
     get_session_factory,
     init_db,
 )
+from app.db.repositories.receipt_repository import SQLiteReceiptRepository
 from app.effects.simulated import SimulatedEffectAdapter
+from app.llm.mock_adapter import MockLLMAdapter
 
 
 # ---------------------------------------------------------------------------
@@ -71,10 +73,17 @@ def runner_env():
     event_repo = SQLiteEventRepository(sf)
     review_repo = SQLiteReviewRepository(sf)
     effect_adapter = SimulatedEffectAdapter()
+    llm_adapter = MockLLMAdapter(responses={
+        HAPPY_PATH_JSON: HAPPY_PATH_JSON,
+        REVIEW_REQUIRED_JSON: REVIEW_REQUIRED_JSON,
+        FORBIDDEN_SYSTEM_JSON: FORBIDDEN_SYSTEM_JSON,
+        PARSE_FAILURE_INPUT: PARSE_FAILURE_INPUT,
+    })
+    receipt_repo = SQLiteReceiptRepository(sf)
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, effect_adapter)
+    runner = LocalRunner(run_repo, event_repo, review_repo, effect_adapter, llm_adapter, receipt_repo)
 
-    return runner, run_repo, event_repo, review_repo
+    return runner, run_repo, event_repo, review_repo, receipt_repo
 
 
 # ---------------------------------------------------------------------------
@@ -84,7 +93,7 @@ def runner_env():
 
 def test_Task004_AC_1_test_demo_1_happy_path(runner_env):
     """Task004 AC-1 test_demo_1_happy_path"""
-    runner, run_repo, event_repo, review_repo = runner_env
+    runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
 
@@ -104,7 +113,7 @@ def test_Task004_AC_1_test_demo_1_happy_path(runner_env):
 
 def test_Task004_AC_2_test_demo_2_review_path(runner_env):
     """Task004 AC-2 test_demo_2_review_path"""
-    runner, run_repo, event_repo, review_repo = runner_env
+    runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     # Phase 1: start_run → review_required
     result1 = runner.start_run(REVIEW_REQUIRED_JSON, RunMode.LIVE)
@@ -126,7 +135,7 @@ def test_Task004_AC_2_test_demo_2_review_path(runner_env):
 
 def test_Task004_AC_3_test_demo_3_validation_failure_forbidden(runner_env):
     """Task004 AC-3 test_demo_3_validation_failure_forbidden"""
-    runner, run_repo, event_repo, review_repo = runner_env
+    runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(FORBIDDEN_SYSTEM_JSON, RunMode.LIVE)
 
@@ -149,7 +158,7 @@ def test_Task004_AC_3_test_demo_3_validation_failure_forbidden(runner_env):
 
 def test_Task004_AC_4_test_demo_4_replay(runner_env):
     """Task004 AC-4 test_demo_4_replay"""
-    runner, run_repo, event_repo, review_repo = runner_env
+    runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     # First complete a run
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
@@ -170,7 +179,7 @@ def test_Task004_AC_4_test_demo_4_replay(runner_env):
 
 def test_Task004_AC_5_test_dry_run_end_to_end(runner_env):
     """Task004 AC-5 test_dry_run_end_to_end"""
-    runner, run_repo, event_repo, review_repo = runner_env
+    runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.DRY_RUN)
 
@@ -199,7 +208,7 @@ def test_Task004_AC_5_test_dry_run_end_to_end(runner_env):
 )
 def test_Task004_EC_1_test_event_counts_per_path(runner_env, input_json, mode, expected_count, desc):
     """Task004 EC-1 test_event_counts_per_path [parametrized]"""
-    runner, run_repo, event_repo, review_repo = runner_env
+    runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(input_json, mode)
     events = event_repo.list_by_run(result.run.run_id)
@@ -213,7 +222,7 @@ def test_Task004_EC_1_test_event_counts_per_path(runner_env, input_json, mode, e
 
 def test_Task004_EC_2_test_projection_stored_correctly(runner_env):
     """Task004 EC-2 test_projection_stored_correctly"""
-    runner, run_repo, event_repo, review_repo = runner_env
+    runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
 
@@ -233,7 +242,7 @@ def test_Task004_EC_2_test_projection_stored_correctly(runner_env):
 
 def test_Task004_EC_3_test_seq_numbers_contiguous(runner_env):
     """Task004 EC-3 test_seq_numbers_contiguous"""
-    runner, run_repo, event_repo, review_repo = runner_env
+    runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
     events = event_repo.list_by_run(result.run.run_id)
@@ -249,10 +258,151 @@ def test_Task004_EC_3_test_seq_numbers_contiguous(runner_env):
 
 def test_Task004_ERR_1_test_submit_review_on_completed_run_raises(runner_env):
     """Task004 ERR-1 test_submit_review_on_completed_run_raises"""
-    runner, run_repo, event_repo, review_repo = runner_env
+    runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
     assert result.projection.status == RunStatus.COMPLETED
 
     with pytest.raises(RunnerError, match="not in review_required status"):
         runner.submit_review(result.run.run_id, ReviewDecision.APPROVE)
+
+
+# ===========================================================================
+# Feature 013 Batch 03 — End-to-end integration tests (Task 003)
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+# Task003 AC-1: End-to-end happy path with receipt stored
+# ---------------------------------------------------------------------------
+
+
+def test_Task003_AC_1_test_e2e_happy_path_receipt_stored(runner_env):
+    """Task003 AC-1 test_e2e_happy_path_receipt_stored"""
+    runner, run_repo, event_repo, review_repo, receipt_repo = runner_env
+
+    result = runner.start_run("New hire needs Salesforce", RunMode.LIVE)
+
+    assert result.projection.status == RunStatus.COMPLETED
+
+    # Receipt exists in DB
+    receipt = receipt_repo.get_by_run(result.run.run_id)
+    assert receipt is not None
+    # raw_response matches MockLLMAdapter default output
+    from app.llm.mock_adapter import DEFAULT_RESPONSE
+
+    assert receipt.raw_response == DEFAULT_RESPONSE
+
+
+# ---------------------------------------------------------------------------
+# Task003 AC-2: End-to-end prompt_version on events
+# ---------------------------------------------------------------------------
+
+
+def test_Task003_AC_2_test_e2e_prompt_version_on_events(runner_env):
+    """Task003 AC-2 test_e2e_prompt_version_on_events"""
+    runner, run_repo, event_repo, review_repo, receipt_repo = runner_env
+
+    result = runner.start_run("New hire needs Salesforce", RunMode.LIVE)
+
+    events = event_repo.list_by_run(result.run.run_id)
+    # All events after run.received carry prompt_version from LLM
+    post_received = [e for e in events if e.event_type != EventType.RUN_RECEIVED]
+    for e in post_received:
+        assert e.version_info.prompt_version == "1.0"
+
+
+# ---------------------------------------------------------------------------
+# Task003 AC-3: End-to-end review path with receipt stored
+# ---------------------------------------------------------------------------
+
+
+def test_Task003_AC_3_test_e2e_review_path_receipt_stored(runner_env):
+    """Task003 AC-3 test_e2e_review_path_receipt_stored"""
+    runner, run_repo, event_repo, review_repo, receipt_repo = runner_env
+
+    result1 = runner.start_run(REVIEW_REQUIRED_JSON, RunMode.LIVE)
+    assert result1.projection.status == RunStatus.REVIEW_REQUIRED
+
+    # Receipt stored before review boundary
+    receipt = receipt_repo.get_by_run(result1.run.run_id)
+    assert receipt is not None
+
+    # Complete the review
+    result2 = runner.submit_review(result1.run.run_id, ReviewDecision.APPROVE)
+    assert result2.projection.status == RunStatus.COMPLETED
+
+
+# ---------------------------------------------------------------------------
+# Task003 EC-1: Parse failure still stores receipt
+# ---------------------------------------------------------------------------
+
+
+def test_Task003_EC_1_test_e2e_parse_failure_receipt_stored(runner_env):
+    """Task003 EC-1 test_e2e_parse_failure_receipt_stored"""
+    runner, run_repo, event_repo, review_repo, receipt_repo = runner_env
+
+    result = runner.start_run(PARSE_FAILURE_INPUT, RunMode.LIVE)
+    assert result.projection.status == RunStatus.PROPOSAL_INVALID
+
+    # Receipt still stored even though parse failed
+    receipt = receipt_repo.get_by_run(result.run.run_id)
+    assert receipt is not None
+    assert receipt.raw_response == PARSE_FAILURE_INPUT
+
+
+# ---------------------------------------------------------------------------
+# Task003 EC-2: Receipt raw_response matches LLM output exactly
+# ---------------------------------------------------------------------------
+
+
+def test_Task003_EC_2_test_e2e_receipt_matches_llm_output(runner_env):
+    """Task003 EC-2 test_e2e_receipt_matches_llm_output"""
+    runner, run_repo, event_repo, review_repo, receipt_repo = runner_env
+
+    result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
+
+    receipt = receipt_repo.get_by_run(result.run.run_id)
+    assert receipt is not None
+    # MockLLMAdapter with pass-through responses: raw_response == HAPPY_PATH_JSON
+    assert receipt.raw_response == HAPPY_PATH_JSON
+
+
+# ---------------------------------------------------------------------------
+# Task003 ERR-1: LLM error prevents receipt storage
+# ---------------------------------------------------------------------------
+
+
+def test_Task003_ERR_1_test_e2e_llm_error_no_receipt():
+    """Task003 ERR-1 test_e2e_llm_error_no_receipt"""
+    from unittest.mock import MagicMock
+
+    from app.llm.base import LLMAdapterError
+
+    # Build a fresh env with a failing LLM adapter
+    engine = get_engine("sqlite:///:memory:")
+    enable_sqlite_fk_pragma(engine)
+    init_db(engine)
+    sf = get_session_factory(engine)
+
+    run_repo = SQLiteRunRepository(sf)
+    event_repo = SQLiteEventRepository(sf)
+    review_repo = SQLiteReviewRepository(sf)
+    effect_adapter = SimulatedEffectAdapter()
+    receipt_repo = SQLiteReceiptRepository(sf)
+
+    failing_adapter = MagicMock()
+    failing_adapter.generate_proposal.side_effect = LLMAdapterError("Service down")
+
+    runner = LocalRunner(run_repo, event_repo, review_repo, effect_adapter, failing_adapter, receipt_repo)
+
+    with pytest.raises(RunnerError, match="LLM|proposal generation"):
+        runner.start_run("any input", RunMode.LIVE)
+
+    # Run was created but LLM error happens before receipt storage
+    # Check that the receipts table has zero rows
+    from sqlalchemy import text
+
+    with sf() as session:
+        count = session.execute(text("SELECT COUNT(*) FROM receipts")).scalar()
+    assert count == 0

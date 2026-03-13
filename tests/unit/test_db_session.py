@@ -32,7 +32,7 @@ class TestTask002AC2InitDbCreatesTables:
         engine = get_engine("sqlite:///:memory:")
         init_db(engine)
         table_names = sorted(inspect(engine).get_table_names())
-        assert table_names == ["events", "reviews", "runs"]
+        assert table_names == ["events", "receipts", "reviews", "runs"]
 
 
 class TestTask002AC3SessionFactoryWorks:
@@ -60,7 +60,7 @@ class TestTask002EC1InitDbIdempotent:
         init_db(engine)
         init_db(engine)  # second call should not raise
         table_names = sorted(inspect(engine).get_table_names())
-        assert table_names == ["events", "reviews", "runs"]
+        assert table_names == ["events", "receipts", "reviews", "runs"]
 
 
 class TestTask002EC2ModuleExports:

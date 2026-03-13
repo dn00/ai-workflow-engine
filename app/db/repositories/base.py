@@ -7,6 +7,7 @@ from sqlalchemy import Engine, event
 
 from app.core.enums import ReviewDecision, RunStatus
 from app.core.models import Event, ReviewTask, Run
+from app.core.receipts.models import Receipt
 
 
 class AbstractRunRepository(ABC):
@@ -52,6 +53,16 @@ class AbstractReviewRepository(ABC):
 
     @abstractmethod
     def get_by_run(self, run_id: str) -> ReviewTask | None: ...
+
+
+class AbstractReceiptRepository(ABC):
+    """Abstract base class for receipt persistence operations."""
+
+    @abstractmethod
+    def create(self, receipt: Receipt) -> Receipt: ...
+
+    @abstractmethod
+    def get_by_run(self, run_id: str) -> Receipt | None: ...
 
 
 def enable_sqlite_fk_pragma(engine: Engine) -> None:

@@ -19,6 +19,8 @@ from app.core.projections.models import RunProjection
 from app.core.runners.base import RunnerError
 from app.core.runners.local_runner import LocalRunner
 from app.core.runners.models import RunResult
+from app.llm.base import LLMAdapterError
+from app.llm.mock_adapter import MockLLMAdapter
 
 
 # ---------------------------------------------------------------------------
@@ -77,6 +79,7 @@ def _make_repos():
     run_repo = MagicMock()
     event_repo = MagicMock()
     review_repo = MagicMock()
+    receipt_repo = MagicMock()
 
     # event_repo.append returns whatever is passed in
     event_repo.append.side_effect = lambda e: e
@@ -105,7 +108,10 @@ def _make_repos():
     # review_repo.create returns whatever is passed in
     review_repo.create.side_effect = lambda r: r
 
-    return run_repo, event_repo, review_repo, _events
+    # receipt_repo.create returns whatever is passed in
+    receipt_repo.create.side_effect = lambda r: r
+
+    return run_repo, event_repo, review_repo, receipt_repo, _events
 
 
 def _make_effect_adapter():
@@ -122,11 +128,12 @@ def _make_effect_adapter():
 
 def test_Task002_AC_1_test_start_run_happy_path_approved_live():
     """Task002 AC-1 test_start_run_happy_path_approved_live"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
         result = runner.start_run('{"request_type": "access_request"}', RunMode.LIVE)
@@ -155,11 +162,12 @@ def test_Task002_AC_1_test_start_run_happy_path_approved_live():
 
 def test_Task002_AC_2_test_start_run_parse_failure():
     """Task002 AC-2 test_start_run_parse_failure"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=False)
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
         result = runner.start_run("not json", RunMode.LIVE)
@@ -183,11 +191,12 @@ def test_Task002_AC_2_test_start_run_parse_failure():
 
 def test_Task002_AC_3_test_start_run_validation_failure():
     """Task002 AC-3 test_start_run_validation_failure"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=False)
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
         result = runner.start_run('{"any": "json"}', RunMode.LIVE)
@@ -210,11 +219,12 @@ def test_Task002_AC_3_test_start_run_validation_failure():
 
 def test_Task002_AC_4_test_start_run_rejected():
     """Task002 AC-4 test_start_run_rejected"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="rejected")
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
         result = runner.start_run('{"any": "json"}', RunMode.LIVE)
@@ -240,11 +250,12 @@ def test_Task002_AC_4_test_start_run_rejected():
 
 def test_Task002_AC_5_test_start_run_review_required():
     """Task002 AC-5 test_start_run_review_required"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="review_required")
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
         result = runner.start_run('{"any": "json"}', RunMode.LIVE)
@@ -271,11 +282,12 @@ def test_Task002_AC_5_test_start_run_review_required():
 
 def test_Task002_AC_6_test_start_run_dry_run_approved():
     """Task002 AC-6 test_start_run_dry_run_approved"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
         result = runner.start_run('{"any": "json"}', RunMode.DRY_RUN)
@@ -302,11 +314,12 @@ def test_Task002_AC_6_test_start_run_dry_run_approved():
 
 def test_Task002_EC_1_test_start_run_seq_numbers_contiguous():
     """Task002 EC-1 test_start_run_seq_numbers_contiguous"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
         runner.start_run('{"any": "json"}', RunMode.LIVE)
@@ -322,11 +335,12 @@ def test_Task002_EC_1_test_start_run_seq_numbers_contiguous():
 
 def test_Task002_EC_2_test_start_run_version_info_on_all_events():
     """Task002 EC-2 test_start_run_version_info_on_all_events"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
         runner.start_run('{"any": "json"}', RunMode.LIVE)
@@ -343,11 +357,12 @@ def test_Task002_EC_2_test_start_run_version_info_on_all_events():
 
 def test_Task002_EC_3_test_start_run_idempotency_key_on_effect_requested():
     """Task002 EC-3 test_start_run_idempotency_key_on_effect_requested"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
         runner.start_run('{"any": "json"}', RunMode.LIVE)
@@ -366,10 +381,11 @@ def test_Task002_EC_3_test_start_run_idempotency_key_on_effect_requested():
 
 def test_Task002_ERR_1_test_start_run_replay_mode_raises():
     """Task002 ERR-1 test_start_run_replay_mode_raises"""
-    run_repo, event_repo, review_repo, _ = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     with pytest.raises(RunnerError, match="replay_run|REPLAY"):
         runner.start_run('{"any": "json"}', RunMode.REPLAY)
@@ -382,10 +398,11 @@ def test_Task002_ERR_1_test_start_run_replay_mode_raises():
 
 def test_Task002_ERR_2_test_start_run_unknown_workflow_type_raises():
     """Task002 ERR-2 test_start_run_unknown_workflow_type_raises"""
-    run_repo, event_repo, review_repo, _ = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
 
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     # Patch get_workflow to raise ValueError (unknown type)
     with patch(
@@ -394,6 +411,144 @@ def test_Task002_ERR_2_test_start_run_unknown_workflow_type_raises():
     ):
         with pytest.raises(RunnerError, match="Unknown workflow type"):
             runner.start_run('{"any": "json"}', RunMode.LIVE)
+
+
+# ===========================================================================
+# Feature 013 Batch 02 — Runner integration (Task 002)
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+# Task002 AC-1: start_run calls LLM and stores receipt
+# ---------------------------------------------------------------------------
+
+
+def test_Task002_AC_1_test_start_run_calls_llm_and_stores_receipt():
+    """Task002 AC-1 test_start_run_calls_llm_and_stores_receipt"""
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
+    adapter = _make_effect_adapter()
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
+    wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        runner.start_run("some input", RunMode.LIVE)
+
+    # receipt_repo.create must have been called with a Receipt containing the LLM raw_response
+    receipt_repo.create.assert_called_once()
+    receipt_arg = receipt_repo.create.call_args[0][0]
+    from app.core.receipts.models import Receipt
+
+    assert isinstance(receipt_arg, Receipt)
+    assert receipt_arg.raw_response == llm_adapter.generate_proposal("some input", "access_request").raw_response
+
+
+# ---------------------------------------------------------------------------
+# Task002 AC-2: start_run wires prompt_version from LLM response
+# ---------------------------------------------------------------------------
+
+
+def test_Task002_AC_2_test_start_run_wires_prompt_version():
+    """Task002 AC-2 test_start_run_wires_prompt_version"""
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
+    adapter = _make_effect_adapter()
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
+    wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        runner.start_run("some input", RunMode.LIVE)
+
+    # All events after run.received should carry the LLM's prompt_version
+    post_received = [e for e in events if e.event_type != EventType.RUN_RECEIVED]
+    for e in post_received:
+        assert e.version_info.prompt_version == "1.0"  # MockLLMAdapter default
+
+
+# ---------------------------------------------------------------------------
+# Task002 AC-3: start_run passes LLM response to parser, not input_text
+# ---------------------------------------------------------------------------
+
+
+def test_Task002_AC_3_test_start_run_passes_llm_response_to_parser():
+    """Task002 AC-3 test_start_run_passes_llm_response_to_parser"""
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
+    adapter = _make_effect_adapter()
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
+    wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        runner.start_run("plain text input", RunMode.LIVE)
+
+    # parse_proposal should receive LLM output, not "plain text input"
+    call_args = wf.parse_proposal.call_args[0][0]
+    assert call_args != "plain text input"
+    # It should be the LLM's raw_response (the MockLLMAdapter default JSON)
+    llm_output = llm_adapter.generate_proposal("plain text input", "access_request").raw_response
+    assert call_args == llm_output
+
+
+# ---------------------------------------------------------------------------
+# Task002 EC-1: DRY_RUN mode calls LLM and stores receipt
+# ---------------------------------------------------------------------------
+
+
+def test_Task002_EC_1_test_start_run_dry_run_calls_llm():
+    """Task002 EC-1 test_start_run_dry_run_calls_llm"""
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
+    adapter = _make_effect_adapter()
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
+    wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        runner.start_run("input", RunMode.DRY_RUN)
+
+    # LLM was called and receipt was stored
+    receipt_repo.create.assert_called_once()
+    # Effects not applied (DRY_RUN)
+    adapter.execute.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# Task002 EC-2: Parse failure stores receipt before failing
+# ---------------------------------------------------------------------------
+
+
+def test_Task002_EC_2_test_start_run_parse_failure_stores_receipt():
+    """Task002 EC-2 test_start_run_parse_failure_stores_receipt"""
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
+    adapter = _make_effect_adapter()
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
+    wf = _make_workflow_module(parse_success=False)
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        result = runner.start_run("input", RunMode.LIVE)
+
+    # Even though parse failed, receipt should still be stored
+    receipt_repo.create.assert_called_once()
+    assert result.projection.status == RunStatus.PROPOSAL_INVALID
+
+
+# ---------------------------------------------------------------------------
+# Task002 ERR-1: LLM adapter error raised as RunnerError
+# ---------------------------------------------------------------------------
+
+
+def test_Task002_ERR_1_test_start_run_llm_error_raises_runner_error():
+    """Task002 ERR-1 test_start_run_llm_error_raises_runner_error"""
+    run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
+    adapter = _make_effect_adapter()
+    llm_adapter = MagicMock()
+    llm_adapter.generate_proposal.side_effect = LLMAdapterError("LLM service unavailable")
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
+    wf = _make_workflow_module()
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        with pytest.raises(RunnerError, match="LLM|proposal generation"):
+            runner.start_run("input", RunMode.LIVE)
 
 
 # ===========================================================================
@@ -428,9 +583,10 @@ def _start_run_to_review_dry(runner, events_list):
 
 def test_Task003_AC_1_test_submit_review_approve_live():
     """Task003 AC-1 test_submit_review_approve_live"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     run_id, review_task = _start_run_to_review(runner, events)
 
@@ -461,9 +617,10 @@ def test_Task003_AC_1_test_submit_review_approve_live():
 
 def test_Task003_AC_2_test_submit_review_reject():
     """Task003 AC-2 test_submit_review_reject"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     run_id, review_task = _start_run_to_review(runner, events)
 
@@ -492,9 +649,10 @@ def test_Task003_AC_2_test_submit_review_reject():
 
 def test_Task003_AC_3_test_submit_review_updates_review_task():
     """Task003 AC-3 test_submit_review_updates_review_task"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     run_id, review_task = _start_run_to_review(runner, events)
 
@@ -519,9 +677,10 @@ def test_Task003_AC_3_test_submit_review_updates_review_task():
 
 def test_Task003_AC_4_test_replay_run_delegates_to_engine():
     """Task003 AC-4 test_replay_run_delegates_to_engine"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     # Set up a run with projection
     run_repo.get.side_effect = lambda rid: Run(
@@ -550,9 +709,10 @@ def test_Task003_AC_4_test_replay_run_delegates_to_engine():
 
 def test_Task003_EC_1_test_submit_review_approve_dry_run():
     """Task003 EC-1 test_submit_review_approve_dry_run"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     run_id, review_task = _start_run_to_review_dry(runner, events)
 
@@ -582,9 +742,10 @@ def test_Task003_EC_1_test_submit_review_approve_dry_run():
 
 def test_Task003_EC_2_test_replay_run_no_events():
     """Task003 EC-2 test_replay_run_no_events"""
-    run_repo, event_repo, review_repo, events = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     run_repo.get.side_effect = lambda rid: Run(run_id=rid, current_projection=None)
     # event_repo.list_by_run returns empty (no events for this run)
@@ -605,9 +766,10 @@ def test_Task003_EC_2_test_replay_run_no_events():
 
 def test_Task003_ERR_1_test_submit_review_wrong_status_raises():
     """Task003 ERR-1 test_submit_review_wrong_status_raises"""
-    run_repo, event_repo, review_repo, _ = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     run_repo.get.side_effect = lambda rid: Run(
         run_id=rid, status=RunStatus.COMPLETED
@@ -624,9 +786,10 @@ def test_Task003_ERR_1_test_submit_review_wrong_status_raises():
 
 def test_Task003_ERR_2_test_submit_review_unknown_run_raises():
     """Task003 ERR-2 test_submit_review_unknown_run_raises"""
-    run_repo, event_repo, review_repo, _ = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     run_repo.get.side_effect = None
     run_repo.get.return_value = None
@@ -642,9 +805,10 @@ def test_Task003_ERR_2_test_submit_review_unknown_run_raises():
 
 def test_Task003_ERR_3_test_replay_run_unknown_run_raises():
     """Task003 ERR-3 test_replay_run_unknown_run_raises"""
-    run_repo, event_repo, review_repo, _ = _make_repos()
+    run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
-    runner = LocalRunner(run_repo, event_repo, review_repo, adapter)
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
 
     run_repo.get.side_effect = None
     run_repo.get.return_value = None

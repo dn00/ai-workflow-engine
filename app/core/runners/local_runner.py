@@ -14,12 +14,15 @@ from app.core.projections.models import RunProjection
 from app.core.projections.reducer import reduce_events
 from app.core.replay.engine import replay_run as _replay_run_engine
 from app.core.replay.models import ReplayResult
+from app.core.receipts.models import Receipt
 from app.db.repositories.base import (
     AbstractEventRepository,
+    AbstractReceiptRepository,
     AbstractReviewRepository,
     AbstractRunRepository,
 )
 from app.effects.base import AbstractEffectAdapter, check_effect_preconditions
+from app.llm.base import AbstractLLMAdapter, LLMAdapterError
 from app.workflows.registry import get_workflow
 
 from .base import AbstractRunner, RunnerError
@@ -35,11 +38,15 @@ class LocalRunner(AbstractRunner):
         event_repo: AbstractEventRepository,
         review_repo: AbstractReviewRepository,
         effect_adapter: AbstractEffectAdapter,
+        llm_adapter: AbstractLLMAdapter,
+        receipt_repo: AbstractReceiptRepository,
     ) -> None:
         self._run_repo = run_repo
         self._event_repo = event_repo
         self._review_repo = review_repo
         self._effect_adapter = effect_adapter
+        self._llm_adapter = llm_adapter
+        self._receipt_repo = receipt_repo
 
     # ------------------------------------------------------------------
     # Private helpers
@@ -145,7 +152,6 @@ class LocalRunner(AbstractRunner):
         run = Run(mode=mode)
         run = self._run_repo.create(run)
         run_id = run.run_id
-        version_info = VersionInfo()
         seq = 1
 
         # Resolve workflow module
@@ -154,15 +160,35 @@ class LocalRunner(AbstractRunner):
         except ValueError as exc:
             raise RunnerError(str(exc)) from exc
 
-        # 1. run.received
+        # 1. run.received (uses default VersionInfo — before LLM call)
         self._emit(
             run_id, seq, EventType.RUN_RECEIVED,
-            ActorType.RUNNER, {}, version_info,
+            ActorType.RUNNER, {}, VersionInfo(),
         )
         seq += 1
 
-        # 2. Parse proposal
-        parse_result = wf.parse_proposal(input_text)
+        # 2. Call LLM adapter
+        try:
+            llm_response = self._llm_adapter.generate_proposal(
+                input_text, run.workflow_type
+            )
+        except LLMAdapterError as exc:
+            raise RunnerError(f"LLM proposal generation failed: {exc}") from exc
+
+        # 3. Store receipt before parsing (INV-1.2)
+        receipt = Receipt(
+            run_id=run_id,
+            raw_response=llm_response.raw_response,
+            prompt_version=llm_response.prompt_version,
+            model_id=llm_response.model_id,
+        )
+        self._receipt_repo.create(receipt)
+
+        # Use real prompt_version from LLM for all subsequent events
+        version_info = VersionInfo(prompt_version=llm_response.prompt_version)
+
+        # 4. Parse proposal from LLM response (not raw input_text)
+        parse_result = wf.parse_proposal(llm_response.raw_response)
         if not parse_result.success:
             # proposal.parse_failed → exit
             self._emit(
@@ -282,8 +308,8 @@ class LocalRunner(AbstractRunner):
         existing_events = self._event_repo.list_by_run(run_id)
         seq = len(existing_events) + 1
 
-        # Update review decision
-        self._review_repo.update_decision(
+        # Update review decision (capture updated object for return)
+        review_task = self._review_repo.update_decision(
             review_task.review_id, decision, datetime.now(timezone.utc)
         )
 
