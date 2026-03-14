@@ -15,7 +15,16 @@ install:
 	pip install -e ".[dev]"
 
 demo:
-	@echo "Demo not yet implemented. Run 'make install' first, then 'uvicorn app.main:app'."
+	@mkdir -p data
+	@echo "============================================="
+	@echo "  AI Workflow Engine — Demo"
+	@echo "============================================="
+	@echo ""
+	@echo "  Open http://127.0.0.1:8000/ui/intake"
+	@echo "  API docs: http://127.0.0.1:8000/docs"
+	@echo "  Press Ctrl+C to stop"
+	@echo ""
+	uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 export-bundle:
-	@echo "Bundle export not yet implemented. Usage: make export-bundle RUN_ID=<id>"
+	python scripts/export_bundle.py $(RUN_ID)
