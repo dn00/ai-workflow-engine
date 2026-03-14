@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.api.routes import runs_router
+from app.web import web_router
 from app.db.repositories import (
     SQLiteEventRepository,
     SQLiteReceiptRepository,
@@ -58,11 +59,14 @@ def create_app(
         fastapi_app.state.runner = runner
         fastapi_app.state.run_repo = run_repo
         fastapi_app.state.event_repo = event_repo
+        fastapi_app.state.receipt_repo = receipt_repo
+        fastapi_app.state.review_repo = review_repo
 
         yield
 
     application = FastAPI(title="AI Workflow Engine", lifespan=lifespan)
     application.include_router(runs_router, prefix="/runs", tags=["runs"])
+    application.include_router(web_router, prefix="/ui", tags=["web"])
     return application
 
 

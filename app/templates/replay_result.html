@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Replay Result — AI Workflow Engine{% endblock %}
+
+{% block content %}
+<h1>Replay Result</h1>
+
+<section style="margin-bottom: 1.5rem;">
+    <h2>Summary</h2>
+    <table style="border-collapse: collapse;">
+        <tr><td style="padding: 0.25rem 0.5rem; font-weight: 600;">Run ID</td><td style="padding: 0.25rem 0.5rem;">{{ result.run_id }}</td></tr>
+        <tr><td style="padding: 0.25rem 0.5rem; font-weight: 600;">Match</td><td style="padding: 0.25rem 0.5rem;">{% if result.match %}Yes{% else %}No{% endif %}</td></tr>
+        <tr><td style="padding: 0.25rem 0.5rem; font-weight: 600;">Event Count</td><td style="padding: 0.25rem 0.5rem;">{{ result.event_count }}</td></tr>
+        {% if result.error %}
+        <tr><td style="padding: 0.25rem 0.5rem; font-weight: 600;">Error</td><td style="padding: 0.25rem 0.5rem; color: #900;">{{ result.error }}</td></tr>
+        {% endif %}
+    </table>
+</section>
+
+<section style="margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 300px;">
+        <h2>Replayed Projection</h2>
+        {% if replayed_json %}
+        <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; white-space: pre-wrap;">{{ replayed_json }}</pre>
+        {% else %}
+        <p>No replayed projection available.</p>
+        {% endif %}
+    </div>
+    <div style="flex: 1; min-width: 300px;">
+        <h2>Stored Projection</h2>
+        {% if stored_json %}
+        <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; white-space: pre-wrap;">{{ stored_json }}</pre>
+        {% else %}
+        <p>No stored projection available.</p>
+        {% endif %}
+    </div>
+</section>
+
+<p><a href="/ui/runs/{{ result.run_id }}">Back to Run Detail</a></p>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Intake — AI Workflow Engine{% endblock %}
+
+{% block content %}
+<h1>Submit Access Request</h1>
+<form method="post" action="/ui/intake">
+    <div style="margin-bottom: 1rem;">
+        <label for="input_text" style="display: block; font-weight: 600; margin-bottom: 0.25rem;">Input Text</label>
+        <textarea id="input_text" name="input_text" rows="6" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-family: inherit;"></textarea>
+    </div>
+    <div style="margin-bottom: 1rem;">
+        <label for="mode" style="display: block; font-weight: 600; margin-bottom: 0.25rem;">Mode</label>
+        <select id="mode" name="mode" style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+            <option value="live">live</option>
+            <option value="dry_run">dry_run</option>
+        </select>
+    </div>
+    <button type="submit" style="background: #1a1a2e; color: #fff; padding: 0.5rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;">Submit</button>
+</form>
+{% endblock %}

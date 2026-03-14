@@ -163,7 +163,7 @@ class LocalRunner(AbstractRunner):
         # 1. run.received (uses default VersionInfo — before LLM call)
         self._emit(
             run_id, seq, EventType.RUN_RECEIVED,
-            ActorType.RUNNER, {}, VersionInfo(),
+            ActorType.RUNNER, {"input_text": input_text}, VersionInfo(),
         )
         seq += 1
 
