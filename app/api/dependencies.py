@@ -3,7 +3,12 @@
 from fastapi import Request
 
 from app.core.runners.local_runner import LocalRunner
-from app.db.repositories.base import AbstractEventRepository, AbstractRunRepository
+from app.db.repositories.base import (
+    AbstractEventRepository,
+    AbstractReceiptRepository,
+    AbstractReviewRepository,
+    AbstractRunRepository,
+)
 
 
 def get_runner(request: Request) -> LocalRunner:
@@ -19,3 +24,13 @@ def get_run_repo(request: Request) -> AbstractRunRepository:
 def get_event_repo(request: Request) -> AbstractEventRepository:
     """Retrieve the event repository from app state."""
     return request.app.state.event_repo
+
+
+def get_receipt_repo(request: Request) -> AbstractReceiptRepository:
+    """Retrieve the receipt repository from app state."""
+    return request.app.state.receipt_repo
+
+
+def get_review_repo(request: Request) -> AbstractReviewRepository:
+    """Retrieve the review repository from app state."""
+    return request.app.state.review_repo

@@ -2,7 +2,12 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.api.dependencies import get_event_repo, get_run_repo, get_runner
+from app.api.dependencies import (
+    get_event_repo,
+    get_receipt_repo,
+    get_run_repo,
+    get_runner,
+)
 from app.api.schemas.runs import (
     CreateRunRequest,
     EventListResponse,
@@ -12,13 +17,18 @@ from app.api.schemas.runs import (
     RunResultResponse,
     SubmitReviewRequest,
 )
+from app.core.bundle import BundleError, assemble_bundle
 from app.core.enums import ReviewDecision, RunMode
 from app.core.models import Event, Run
 from app.core.replay.models import ReplayResult
 from app.core.runners.base import RunnerError
 from app.core.runners.local_runner import LocalRunner
 from app.core.runners.models import RunResult
-from app.db.repositories.base import AbstractEventRepository, AbstractRunRepository
+from app.db.repositories.base import (
+    AbstractEventRepository,
+    AbstractReceiptRepository,
+    AbstractRunRepository,
+)
 
 router = APIRouter()
 
@@ -157,3 +167,24 @@ def replay_run(
     except RunnerError as exc:
         raise _map_runner_error(exc)
     return _serialize_replay_result(result)
+
+
+# ---------------------------------------------------------------------------
+# Task 002 (Feature 015): Bundle endpoint
+# ---------------------------------------------------------------------------
+
+
+@router.get("/{run_id}/bundle")
+def get_run_bundle(
+    run_id: str,
+    run_repo: AbstractRunRepository = Depends(get_run_repo),
+    event_repo: AbstractEventRepository = Depends(get_event_repo),
+    receipt_repo: AbstractReceiptRepository = Depends(get_receipt_repo),
+):
+    """Export replay bundle for a run (spec §25)."""
+    try:
+        bundle = assemble_bundle(run_id, run_repo, event_repo, receipt_repo)
+    except BundleError as exc:
+        status = 404 if "not found" in str(exc).lower() else 400
+        raise HTTPException(status_code=status, detail=str(exc))
+    return bundle
