@@ -1,4 +1,4 @@
-"""Unit tests for Receipt infrastructure (Feature 013, Batch 01, Task 001)."""
+"""Unit tests for Receipt infrastructure."""
 
 from datetime import datetime, timezone
 
@@ -68,9 +68,7 @@ def _make_receipt(run_id: str = "run-001", **overrides) -> Receipt:
 # ---------------------------------------------------------------------------
 
 
-class TestTask001AC1ReceiptModelDefaults:
-    """Task001 AC-1 test_receipt_model_defaults"""
-
+class TestReceiptModelDefaults:
     def test_receipt_model_defaults(self) -> None:
         receipt = Receipt(
             run_id="r-1", raw_response="...", prompt_version="1.0"
@@ -81,9 +79,7 @@ class TestTask001AC1ReceiptModelDefaults:
         assert receipt.model_id is None
 
 
-class TestTask001AC2ReceiptRowRoundTrip:
-    """Task001 AC-2 test_receipt_row_round_trip"""
-
+class TestReceiptRowRoundTrip:
     def test_receipt_row_round_trip(self, session_factory, persisted_run) -> None:
         from app.db.models import ReceiptRow
 
@@ -111,9 +107,7 @@ class TestTask001AC2ReceiptRowRoundTrip:
             assert fetched.created_at is not None
 
 
-class TestTask001AC3CreatePersistsReceipt:
-    """Task001 AC-3 test_create_persists_receipt"""
-
+class TestCreatePersistsReceipt:
     def test_create_persists_and_returns_receipt(self, repo, persisted_run) -> None:
         receipt = _make_receipt()
         result = repo.create(receipt)
@@ -127,9 +121,7 @@ class TestTask001AC3CreatePersistsReceipt:
         assert fetched.receipt_id == receipt.receipt_id
 
 
-class TestTask001AC4GetByRunRetrieves:
-    """Task001 AC-4 test_get_by_run_retrieves"""
-
+class TestGetByRunRetrieves:
     def test_get_by_run_retrieves(self, repo, persisted_run) -> None:
         receipt = _make_receipt()
         repo.create(receipt)
@@ -144,17 +136,13 @@ class TestTask001AC4GetByRunRetrieves:
 # ---------------------------------------------------------------------------
 
 
-class TestTask001EC1GetByRunUnknownReturnsNone:
-    """Task001 EC-1 test_get_by_run_unknown_returns_none"""
-
+class TestGetByRunUnknownReturnsNone:
     def test_get_by_run_unknown_returns_none(self, repo) -> None:
         result = repo.get_by_run("nonexistent")
         assert result is None
 
 
-class TestTask001EC2ReceiptModelIdNoneRoundTrip:
-    """Task001 EC-2 test_receipt_model_id_none_round_trip"""
-
+class TestReceiptModelIdNoneRoundTrip:
     def test_receipt_model_id_none_round_trip(self, repo, persisted_run) -> None:
         receipt = _make_receipt(model_id=None)
         repo.create(receipt)
@@ -168,9 +156,7 @@ class TestTask001EC2ReceiptModelIdNoneRoundTrip:
 # ---------------------------------------------------------------------------
 
 
-class TestTask001ERR1CreateFkViolationRaises:
-    """Task001 ERR-1 test_create_fk_violation_raises"""
-
+class TestCreateFkViolationRaises:
     def test_create_fk_violation_raises(self, repo) -> None:
         receipt = _make_receipt(run_id="no-such-run")
         with pytest.raises(IntegrityError):

@@ -1,4 +1,4 @@
-"""Tests for policy engine (Feature 007, Task 001)."""
+"""Tests for policy engine."""
 
 from app.core.enums import ReasonCode
 from app.workflows.access_request.policy import evaluate_policy
@@ -35,9 +35,7 @@ def _valid_result() -> ValidationResult:
     return ValidationResult(is_valid=True, errors=[])
 
 
-class TestTask001AC1ValidationFailureRejected:
-    """Task001 AC-1 test_validation_failure_rejected"""
-
+class TestValidationFailureRejected:
     def test_validation_failure_rejected(self) -> None:
         proposal = _make_valid_proposal()
         normalized = _make_valid_normalized()
@@ -51,9 +49,7 @@ class TestTask001AC1ValidationFailureRejected:
         assert result.allowed_actions == []
 
 
-class TestTask001AC2MissingManagerReview:
-    """Task001 AC-2 test_missing_manager_review"""
-
+class TestMissingManagerReview:
     def test_missing_manager_review(self) -> None:
         proposal = _make_valid_proposal()
         normalized = NormalizedFields(
@@ -66,9 +62,7 @@ class TestTask001AC2MissingManagerReview:
         assert AccessRequestReasonCode.MISSING_MANAGER_NAME in result.reason_codes
 
 
-class TestTask001AC3HighUrgencyReview:
-    """Task001 AC-3 test_high_urgency_review"""
-
+class TestHighUrgencyReview:
     def test_high_urgency_review(self) -> None:
         proposal = _make_valid_proposal()
         proposal.urgency = "high"
@@ -78,9 +72,7 @@ class TestTask001AC3HighUrgencyReview:
         assert AccessRequestReasonCode.HIGH_URGENCY in result.reason_codes
 
 
-class TestTask001AC4TooManySystemsReview:
-    """Task001 AC-4 test_too_many_systems_review"""
-
+class TestTooManySystemsReview:
     def test_too_many_systems_review(self) -> None:
         proposal = _make_valid_proposal()
         proposal.systems_requested = ["salesforce", "jira", "slack"]
@@ -94,9 +86,7 @@ class TestTask001AC4TooManySystemsReview:
         assert AccessRequestReasonCode.TOO_MANY_SYSTEMS in result.reason_codes
 
 
-class TestTask001AC5AutoApproveAllConditions:
-    """Task001 AC-5 test_auto_approve_all_conditions"""
-
+class TestAutoApproveAllConditions:
     def test_auto_approve_all_conditions(self) -> None:
         proposal = _make_valid_proposal()
         normalized = _make_valid_normalized()
@@ -106,9 +96,7 @@ class TestTask001AC5AutoApproveAllConditions:
         assert result.allowed_actions == ["create_simulated_approval_task"]
 
 
-class TestTask001AC6RejectedEmptyActions:
-    """Task001 AC-6 test_rejected_empty_actions"""
-
+class TestRejectedEmptyActions:
     def test_rejected_empty_actions(self) -> None:
         proposal = _make_valid_proposal()
         normalized = _make_valid_normalized()
@@ -121,9 +109,7 @@ class TestTask001AC6RejectedEmptyActions:
         assert result.allowed_actions == []
 
 
-class TestTask001AC7ReviewCreateReviewTaskAction:
-    """Task001 AC-7 test_review_create_review_task_action"""
-
+class TestReviewCreateReviewTaskAction:
     def test_review_create_review_task_action(self) -> None:
         proposal = _make_valid_proposal()
         proposal.urgency = "high"
@@ -133,9 +119,7 @@ class TestTask001AC7ReviewCreateReviewTaskAction:
         assert result.allowed_actions == ["create_review_task"]
 
 
-class TestTask001EC1MultipleReviewTriggers:
-    """Task001 EC-1 test_multiple_review_triggers"""
-
+class TestMultipleReviewTriggers:
     def test_multiple_review_triggers(self) -> None:
         proposal = _make_valid_proposal()
         proposal.urgency = "high"
@@ -152,9 +136,7 @@ class TestTask001EC1MultipleReviewTriggers:
         assert AccessRequestReasonCode.TOO_MANY_SYSTEMS in result.reason_codes
 
 
-class TestTask001EC2KnownNotLowRiskReview:
-    """Task001 EC-2 test_known_not_low_risk_review"""
-
+class TestKnownNotLowRiskReview:
     def test_known_not_low_risk_review(self) -> None:
         proposal = _make_valid_proposal()
         proposal.systems_requested = ["aws"]
@@ -171,9 +153,7 @@ class TestTask001EC2KnownNotLowRiskReview:
         )
 
 
-class TestTask001EC3NotesAmbiguityReview:
-    """Task001 EC-3 test_notes_ambiguity_review"""
-
+class TestNotesAmbiguityReview:
     def test_notes_ambiguity_review(self) -> None:
         proposal = _make_valid_proposal()
         proposal.notes = ["Employee start date is ambiguous"]
@@ -183,9 +163,7 @@ class TestTask001EC3NotesAmbiguityReview:
         assert ReasonCode.AMBIGUOUS_NORMALIZATION in result.reason_codes
 
 
-class TestTask001EC4UrgencyCaseInsensitive:
-    """Task001 EC-4 test_urgency_case_insensitive"""
-
+class TestUrgencyCaseInsensitive:
     def test_urgency_case_insensitive(self) -> None:
         proposal = _make_valid_proposal()
         proposal.urgency = "High"
@@ -195,9 +173,7 @@ class TestTask001EC4UrgencyCaseInsensitive:
         assert AccessRequestReasonCode.HIGH_URGENCY in result.reason_codes
 
 
-class TestTask001EC5TwoLowRiskSystemsApprove:
-    """Task001 EC-5 test_two_low_risk_systems_approve"""
-
+class TestTwoLowRiskSystemsApprove:
     def test_two_low_risk_systems_approve(self) -> None:
         proposal = _make_valid_proposal()
         proposal.systems_requested = ["salesforce", "jira"]
@@ -210,9 +186,7 @@ class TestTask001EC5TwoLowRiskSystemsApprove:
         assert result.status == "approved"
 
 
-class TestTask001EC6EmptyNotesNoAmbiguity:
-    """Task001 EC-6 test_empty_notes_no_ambiguity"""
-
+class TestEmptyNotesNoAmbiguity:
     def test_empty_notes_no_ambiguity(self) -> None:
         proposal = _make_valid_proposal()
         proposal.notes = []
@@ -228,9 +202,7 @@ class TestTask001EC6EmptyNotesNoAmbiguity:
         assert ReasonCode.AMBIGUOUS_NORMALIZATION not in result.reason_codes
 
 
-class TestTask001ERR1MultipleValidationErrorsForwarded:
-    """Task001 ERR-1 test_multiple_validation_errors_forwarded"""
-
+class TestMultipleValidationErrorsForwarded:
     def test_multiple_validation_errors_forwarded(self) -> None:
         proposal = _make_valid_proposal()
         normalized = _make_valid_normalized()
@@ -244,9 +216,7 @@ class TestTask001ERR1MultipleValidationErrorsForwarded:
         assert "missing_employee_name" in result.reason_codes
 
 
-class TestTask001ERR2NormalizedFieldsAlwaysPresent:
-    """Task001 ERR-2 test_normalized_fields_always_present"""
-
+class TestNormalizedFieldsAlwaysPresent:
     def test_normalized_fields_in_approved(self) -> None:
         proposal = _make_valid_proposal()
         normalized = _make_valid_normalized()

@@ -1,4 +1,4 @@
-"""Tests for ReplayBundle model + assemble_bundle (Feature 015, Batch 01, Task 001)."""
+"""Tests for ReplayBundle model + assemble_bundle."""
 
 from datetime import datetime, timezone
 from unittest.mock import MagicMock
@@ -64,13 +64,11 @@ def _mock_repos(
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-1: test_assemble_bundle_complete_run
+# test_assemble_bundle_complete_run
 # ---------------------------------------------------------------------------
 
 
 class TestAssembleBundleCompleteRun:
-    """Task001 AC-1 test_assemble_bundle_complete_run"""
-
     def test_assemble_bundle_complete_run(self):
         from app.core.bundle import assemble_bundle
 
@@ -88,13 +86,11 @@ class TestAssembleBundleCompleteRun:
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-2: test_bundle_metadata_fields
+# test_bundle_metadata_fields
 # ---------------------------------------------------------------------------
 
 
 class TestBundleMetadataFields:
-    """Task001 AC-2 test_bundle_metadata_fields"""
-
     def test_bundle_metadata_fields(self):
         from app.core.bundle import assemble_bundle
 
@@ -111,13 +107,11 @@ class TestBundleMetadataFields:
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-3: test_bundle_events_ordered_by_seq
+# test_bundle_events_ordered_by_seq
 # ---------------------------------------------------------------------------
 
 
 class TestBundleEventsOrderedBySeq:
-    """Task001 AC-3 test_bundle_events_ordered_by_seq"""
-
     def test_bundle_events_ordered_by_seq(self):
         from app.core.bundle import assemble_bundle
 
@@ -133,13 +127,11 @@ class TestBundleEventsOrderedBySeq:
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-4: test_bundle_barrel_exports
+# test_bundle_barrel_exports
 # ---------------------------------------------------------------------------
 
 
 class TestBundleBarrelExports:
-    """Task001 AC-4 test_bundle_barrel_exports"""
-
     def test_bundle_barrel_exports(self):
         # Bundle-level imports
         from app.core.bundle import BundleError, ReplayBundle, assemble_bundle
@@ -159,13 +151,11 @@ class TestBundleBarrelExports:
 
 
 # ---------------------------------------------------------------------------
-# Task001 EC-1: test_bundle_no_receipt
+# test_bundle_no_receipt
 # ---------------------------------------------------------------------------
 
 
 class TestBundleNoReceipt:
-    """Task001 EC-1 test_bundle_no_receipt"""
-
     def test_bundle_no_receipt(self):
         from app.core.bundle import assemble_bundle
 
@@ -179,13 +169,11 @@ class TestBundleNoReceipt:
 
 
 # ---------------------------------------------------------------------------
-# Task001 EC-2: test_bundle_no_projection
+# test_bundle_no_projection
 # ---------------------------------------------------------------------------
 
 
 class TestBundleNoProjection:
-    """Task001 EC-2 test_bundle_no_projection"""
-
     def test_bundle_no_projection(self):
         from app.core.bundle import assemble_bundle
 
@@ -199,13 +187,11 @@ class TestBundleNoProjection:
 
 
 # ---------------------------------------------------------------------------
-# Task001 ERR-1: test_bundle_unknown_run
+# test_bundle_unknown_run
 # ---------------------------------------------------------------------------
 
 
 class TestBundleUnknownRun:
-    """Task001 ERR-1 test_bundle_unknown_run"""
-
     def test_bundle_unknown_run(self):
         from app.core.bundle import BundleError, assemble_bundle
 
@@ -216,13 +202,11 @@ class TestBundleUnknownRun:
 
 
 # ---------------------------------------------------------------------------
-# Task001 ERR-2: test_bundle_no_events
+# test_bundle_no_events
 # ---------------------------------------------------------------------------
 
 
 class TestBundleNoEvents:
-    """Task001 ERR-2 test_bundle_no_events"""
-
     def test_bundle_no_events(self):
         from app.core.bundle import BundleError, assemble_bundle
 

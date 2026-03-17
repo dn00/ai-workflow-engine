@@ -1,4 +1,4 @@
-"""Tests for core models (Feature 002, Task 002)."""
+"""Tests for core models."""
 
 import pytest
 from pydantic import ValidationError
@@ -20,9 +20,7 @@ from app.core.models import (
 )
 
 
-class TestTask002AC1VersionInfoDefaultsAndCustom:
-    """Task002 AC-1 test_version_info_defaults_and_custom"""
-
+class TestVersionInfoDefaultsAndCustom:
     def test_defaults(self) -> None:
         v = VersionInfo()
         assert v.proposal_schema_version == "1.0"
@@ -40,9 +38,7 @@ class TestTask002AC1VersionInfoDefaultsAndCustom:
         assert v.policy_version == "2.0"
 
 
-class TestTask002AC2EventValidatesWithRequiredFields:
-    """Task002 AC-2 test_event_validates_with_required_fields"""
-
+class TestEventValidatesWithRequiredFields:
     def test_event_with_required_fields(self) -> None:
         e = Event(
             run_id="run-123",
@@ -60,9 +56,7 @@ class TestTask002AC2EventValidatesWithRequiredFields:
         assert e.timestamp  # auto-generated
 
 
-class TestTask002AC3RunDefaults:
-    """Task002 AC-3 test_run_defaults"""
-
+class TestRunDefaults:
     def test_run_defaults(self) -> None:
         r = Run()
         assert r.run_id  # auto-generated UUID
@@ -73,9 +67,7 @@ class TestTask002AC3RunDefaults:
         assert r.updated_at is not None
 
 
-class TestTask002AC4ValidatedDecisionSample:
-    """Task002 AC-4 test_validated_decision_sample"""
-
+class TestValidatedDecisionSample:
     def test_sample_decision(self) -> None:
         d = ValidatedDecision(
             status="review_required",
@@ -97,9 +89,7 @@ class TestTask002AC4ValidatedDecisionSample:
         assert d.allowed_actions == ["create_review_task"]
 
 
-class TestTask002AC5ReviewTaskDefaults:
-    """Task002 AC-5 test_review_task_defaults"""
-
+class TestReviewTaskDefaults:
     def test_review_task_defaults(self) -> None:
         rt = ReviewTask(run_id="run-456")
         assert rt.review_id  # auto-generated
@@ -109,9 +99,7 @@ class TestTask002AC5ReviewTaskDefaults:
         assert rt.reviewed_at is None
 
 
-class TestTask002EC1EventOptionalIdempotencyKey:
-    """Task002 EC-1 test_event_optional_idempotency_key"""
-
+class TestEventOptionalIdempotencyKey:
     def test_idempotency_key_defaults_to_none(self) -> None:
         e = Event(
             run_id="run-123",
@@ -124,17 +112,13 @@ class TestTask002EC1EventOptionalIdempotencyKey:
         assert e.idempotency_key is None
 
 
-class TestTask002EC2RunOptionalProjection:
-    """Task002 EC-2 test_run_optional_projection"""
-
+class TestRunOptionalProjection:
     def test_projection_defaults_to_none(self) -> None:
         r = Run()
         assert r.current_projection is None
 
 
-class TestTask002ERR1EventMissingRequiredField:
-    """Task002 ERR-1 test_event_missing_required_field"""
-
+class TestEventMissingRequiredField:
     def test_missing_run_id_raises(self) -> None:
         with pytest.raises(ValidationError) as exc_info:
             Event(
@@ -148,9 +132,7 @@ class TestTask002ERR1EventMissingRequiredField:
         assert "run_id" in error_text
 
 
-class TestTask001AC4ValidatedDecisionGenericTypes:
-    """Task001 AC-4 test_validated_decision_generic_types"""
-
+class TestValidatedDecisionGenericTypes:
     def test_accepts_string_reason_codes_and_dict(self) -> None:
         d = ValidatedDecision(
             status="approved",
@@ -172,9 +154,7 @@ class TestTask001AC4ValidatedDecisionGenericTypes:
         assert d.normalized_fields == {}
 
 
-class TestTask001EC2StrEnumAcceptedAsStr:
-    """Task001 EC-2 test_strenum_accepted_as_str"""
-
+class TestStrEnumAcceptedAsStr:
     def test_strenum_in_reason_codes(self) -> None:
         d = ValidatedDecision(
             status="validated",

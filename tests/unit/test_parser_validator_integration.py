@@ -1,4 +1,4 @@
-"""Integration tests for parser-validator pipeline (Feature 006, Task 006)."""
+"""Integration tests for parser-validator pipeline."""
 
 import json
 
@@ -7,9 +7,7 @@ import pytest
 from app.workflows.access_request.reason_codes import AccessRequestReasonCode
 
 
-class TestTask006AC1PipelineValidInput:
-    """Task006 AC-1 test_pipeline_valid_input"""
-
+class TestPipelineValidInput:
     def test_full_pipeline_success(self) -> None:
         from app.workflows.access_request import (
             normalize_proposal,
@@ -39,9 +37,7 @@ class TestTask006AC1PipelineValidInput:
         assert validation.errors == []
 
 
-class TestTask006AC2PipelineMalformedJson:
-    """Task006 AC-2 test_pipeline_malformed_json"""
-
+class TestPipelineMalformedJson:
     def test_malformed_json_stops_at_parse(self) -> None:
         from app.workflows.access_request import parse_proposal
 
@@ -51,9 +47,7 @@ class TestTask006AC2PipelineMalformedJson:
         assert result.error is not None
 
 
-class TestTask006AC3ModuleExports:
-    """Task006 AC-3 test_module_exports"""
-
+class TestModuleExports:
     def test_all_functions_importable(self) -> None:
         from app.workflows.access_request import (
             normalize_proposal,
@@ -66,9 +60,7 @@ class TestTask006AC3ModuleExports:
         assert callable(validate_proposal)
 
 
-class TestTask006AC4RegistryResolvesAccessRequest:
-    """Task006 AC-4 test_registry_resolves_access_request"""
-
+class TestRegistryResolvesAccessRequest:
     def test_get_workflow_returns_module(self) -> None:
         from app.workflows.registry import get_workflow
 
@@ -77,9 +69,7 @@ class TestTask006AC4RegistryResolvesAccessRequest:
         assert module.__name__ == "app.workflows.access_request"
 
 
-class TestTask006AC5ResolvedModuleHasFunctions:
-    """Task006 AC-5 test_resolved_module_has_functions"""
-
+class TestResolvedModuleHasFunctions:
     def test_module_has_pipeline_functions(self) -> None:
         from app.workflows.registry import get_workflow
 
@@ -89,9 +79,7 @@ class TestTask006AC5ResolvedModuleHasFunctions:
         assert callable(getattr(module, "validate_proposal", None))
 
 
-class TestTask006EC1PipelinePartialInput:
-    """Task006 EC-1 test_pipeline_partial_input"""
-
+class TestPipelinePartialInput:
     def test_missing_name_and_unknown_system(self) -> None:
         from app.workflows.access_request import (
             normalize_proposal,
@@ -116,9 +104,7 @@ class TestTask006EC1PipelinePartialInput:
         assert len(validation.errors) >= 2
 
 
-class TestTask006EC2ListWorkflowTypes:
-    """Task006 EC-2 test_list_workflow_types"""
-
+class TestListWorkflowTypes:
     def test_returns_access_request(self) -> None:
         from app.workflows.registry import list_workflow_types
 
@@ -126,9 +112,7 @@ class TestTask006EC2ListWorkflowTypes:
         assert "access_request" in types
 
 
-class TestTask006ERR1PipelineForbiddenSystem:
-    """Task006 ERR-1 test_pipeline_forbidden_system"""
-
+class TestPipelineForbiddenSystem:
     def test_forbidden_system_detected(self) -> None:
         from app.workflows.access_request import (
             normalize_proposal,
@@ -158,9 +142,7 @@ class TestTask006ERR1PipelineForbiddenSystem:
         )
 
 
-class TestTask006ERR2UnknownWorkflowRaises:
-    """Task006 ERR-2 test_unknown_workflow_raises"""
-
+class TestUnknownWorkflowRaises:
     def test_nonexistent_raises_valueerror(self) -> None:
         from app.workflows.registry import get_workflow
 

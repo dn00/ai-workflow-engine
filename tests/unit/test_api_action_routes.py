@@ -1,6 +1,4 @@
 """Tests for action endpoints: POST /runs/{run_id}/review, POST /runs/{run_id}/replay.
-
-Feature 014, Batch 02, Task 003.
 """
 
 import json
@@ -65,12 +63,11 @@ def _create_completed_run(client: TestClient) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-1: POST /runs/{run_id}/review approves a pending run
+# POST /runs/{run_id}/review approves a pending run
 # ---------------------------------------------------------------------------
 
 
 def test_review_approve(client: TestClient):
-    """Task003 AC-1 test_review_approve"""
     run_id = _create_review_run(client)
 
     resp = client.post(f"/runs/{run_id}/review", json={"decision": "approve"})
@@ -81,12 +78,11 @@ def test_review_approve(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-2: POST /runs/{run_id}/review rejects a pending run
+# POST /runs/{run_id}/review rejects a pending run
 # ---------------------------------------------------------------------------
 
 
 def test_review_reject(client: TestClient):
-    """Task003 AC-2 test_review_reject"""
     run_id = _create_review_run(client)
 
     resp = client.post(f"/runs/{run_id}/review", json={"decision": "reject"})
@@ -97,12 +93,11 @@ def test_review_reject(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-3: POST /runs/{run_id}/replay returns replay result
+# POST /runs/{run_id}/replay returns replay result
 # ---------------------------------------------------------------------------
 
 
 def test_replay_run(client: TestClient):
-    """Task003 AC-3 test_replay_run"""
     run_id = _create_completed_run(client)
 
     resp = client.post(f"/runs/{run_id}/replay")
@@ -116,12 +111,11 @@ def test_replay_run(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task003 EC-1: Replay on completed run with matching projection
+# Replay on completed run with matching projection
 # ---------------------------------------------------------------------------
 
 
 def test_replay_completed_run_match(client: TestClient):
-    """Task003 EC-1 test_replay_completed_run_match"""
     run_id = _create_completed_run(client)
 
     resp = client.post(f"/runs/{run_id}/replay")
@@ -133,12 +127,11 @@ def test_replay_completed_run_match(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task003 EC-2: Review response includes review_task
+# Review response includes review_task
 # ---------------------------------------------------------------------------
 
 
 def test_review_response_includes_review_task(client: TestClient):
-    """Task003 EC-2 test_review_response_includes_review_task"""
     run_id = _create_review_run(client)
 
     resp = client.post(f"/runs/{run_id}/review", json={"decision": "approve"})
@@ -151,24 +144,22 @@ def test_review_response_includes_review_task(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task003 ERR-1: POST /runs/{run_id}/review returns 404 for unknown run
+# POST /runs/{run_id}/review returns 404 for unknown run
 # ---------------------------------------------------------------------------
 
 
 def test_review_404_unknown_run(client: TestClient):
-    """Task003 ERR-1 test_review_404_unknown_run"""
     resp = client.post("/runs/nonexistent-uuid/review", json={"decision": "approve"})
     assert resp.status_code == 404
     assert "Run not found: nonexistent-uuid" in resp.json()["detail"]
 
 
 # ---------------------------------------------------------------------------
-# Task003 ERR-2: POST /runs/{run_id}/review returns 409 for wrong state
+# POST /runs/{run_id}/review returns 409 for wrong state
 # ---------------------------------------------------------------------------
 
 
 def test_review_409_wrong_state(client: TestClient):
-    """Task003 ERR-2 test_review_409_wrong_state"""
     run_id = _create_completed_run(client)
 
     resp = client.post(f"/runs/{run_id}/review", json={"decision": "approve"})
@@ -177,12 +168,11 @@ def test_review_409_wrong_state(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task003 ERR-3: POST /runs/{run_id}/replay returns 404 for unknown run
+# POST /runs/{run_id}/replay returns 404 for unknown run
 # ---------------------------------------------------------------------------
 
 
 def test_replay_404_unknown_run(client: TestClient):
-    """Task003 ERR-3 test_replay_404_unknown_run"""
     resp = client.post("/runs/nonexistent-uuid/replay")
     assert resp.status_code == 404
     assert "Run not found: nonexistent-uuid" in resp.json()["detail"]

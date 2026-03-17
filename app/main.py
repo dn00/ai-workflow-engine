@@ -1,11 +1,11 @@
 """FastAPI application entry point."""
 
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
 from app.api.routes import runs_router
-from app.web import web_router
 from app.db.repositories import (
     SQLiteEventRepository,
     SQLiteReceiptRepository,
@@ -15,7 +15,8 @@ from app.db.repositories import (
 )
 from app.db.session import get_engine, get_session_factory, init_db
 from app.effects import SimulatedEffectAdapter
-from app.llm import AbstractLLMAdapter, MockLLMAdapter
+from app.llm import AbstractLLMAdapter, CliLLMAdapter, MockLLMAdapter
+from app.web import web_router
 
 
 def create_app(
@@ -41,7 +42,12 @@ def create_app(
 
         # Create adapters
         effect_adapter = SimulatedEffectAdapter()
-        adapter = llm_adapter or MockLLMAdapter()
+        if llm_adapter is not None:
+            adapter = llm_adapter
+        elif os.environ.get("LLM_ADAPTER") == "cli":
+            adapter = CliLLMAdapter()
+        else:
+            adapter = MockLLMAdapter()
 
         # Create runner
         from app.core.runners.local_runner import LocalRunner

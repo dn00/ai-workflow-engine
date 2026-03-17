@@ -1,6 +1,4 @@
 """Cross-endpoint integration tests exercising full API flows for all demo scenarios.
-
-Feature 014, Batch 03, Task 004.
 Tests use TestClient + create_app with in-memory SQLite and configured MockLLMAdapter.
 """
 
@@ -60,12 +58,11 @@ def client():
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-1: Demo 1 — happy path via API
+# Demo 1 — happy path via API
 # ---------------------------------------------------------------------------
 
 
 def test_demo_1_happy_path_via_api(client: TestClient):
-    """Task004 AC-1 test_demo_1_happy_path_via_api"""
     # POST /runs — create a run
     create_resp = client.post(
         "/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"}
@@ -90,12 +87,11 @@ def test_demo_1_happy_path_via_api(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-2: Demo 2 — review path via API
+# Demo 2 — review path via API
 # ---------------------------------------------------------------------------
 
 
 def test_demo_2_review_path_via_api(client: TestClient):
-    """Task004 AC-2 test_demo_2_review_path_via_api"""
     # POST /runs — create run that needs review
     create_resp = client.post(
         "/runs", json={"input_text": REVIEW_PATH_INPUT, "mode": "live"}
@@ -125,12 +121,11 @@ def test_demo_2_review_path_via_api(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-3: Demo 3 — rejection path via API
+# Demo 3 — rejection path via API
 # ---------------------------------------------------------------------------
 
 
 def test_demo_3_rejection_via_api(client: TestClient):
-    """Task004 AC-3 test_demo_3_rejection_via_api"""
     # POST /runs with forbidden system — triggers validation failure
     create_resp = client.post(
         "/runs", json={"input_text": REJECTION_PATH_INPUT, "mode": "live"}
@@ -153,12 +148,11 @@ def test_demo_3_rejection_via_api(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-4: Demo 4 — replay via API
+# Demo 4 — replay via API
 # ---------------------------------------------------------------------------
 
 
 def test_demo_4_replay_via_api(client: TestClient):
-    """Task004 AC-4 test_demo_4_replay_via_api"""
     # Create a completed run first
     create_resp = client.post(
         "/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"}
@@ -178,12 +172,11 @@ def test_demo_4_replay_via_api(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task004 EC-1: Events accumulate across API calls
+# Events accumulate across API calls
 # ---------------------------------------------------------------------------
 
 
 def test_events_accumulate(client: TestClient):
-    """Task004 EC-1 test_events_accumulate"""
     # Create a happy-path run (produces 7 events for live auto-approve)
     create_resp = client.post(
         "/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"}
@@ -205,12 +198,11 @@ def test_events_accumulate(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task004 ERR-1: Review on completed (non-review_required) run returns 409
+# Review on completed (non-review_required) run returns 409
 # ---------------------------------------------------------------------------
 
 
 def test_review_on_completed_run_409(client: TestClient):
-    """Task004 ERR-1 test_review_on_completed_run_409"""
     # Create a happy-path run (auto-approved, status=completed)
     create_resp = client.post(
         "/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"}

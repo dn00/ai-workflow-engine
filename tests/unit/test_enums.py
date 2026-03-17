@@ -1,4 +1,4 @@
-"""Tests for core enums (Feature 002, Task 001)."""
+"""Tests for core enums."""
 
 import pytest
 
@@ -13,9 +13,7 @@ from app.core.enums import (
 )
 
 
-class TestTask001AC1RunStatusHas10Values:
-    """Task001 AC-1 test_run_status_has_10_values"""
-
+class TestRunStatusHas10Values:
     def test_run_status_has_10_values(self) -> None:
         assert len(RunStatus) == 10
 
@@ -35,9 +33,7 @@ class TestTask001AC1RunStatusHas10Values:
         assert {m.value for m in RunStatus} == expected
 
 
-class TestTask001AC2EventTypeHas12Values:
-    """Task001 AC-2 test_event_type_has_12_values"""
-
+class TestEventTypeHas12Values:
     def test_event_type_has_12_values(self) -> None:
         assert len(EventType) == 12
 
@@ -59,9 +55,7 @@ class TestTask001AC2EventTypeHas12Values:
         assert {m.value for m in EventType} == expected
 
 
-class TestTask001AC1CoreReasonCodeHas4Values:
-    """Task001 AC-1 test_core_reason_code_has_4_values"""
-
+class TestCoreReasonCodeHas4Values:
     def test_core_reason_code_has_4_values(self) -> None:
         assert len(ReasonCode) == 4
 
@@ -75,9 +69,7 @@ class TestTask001AC1CoreReasonCodeHas4Values:
         assert {m.value for m in ReasonCode} == expected
 
 
-class TestTask001AC4OtherEnumsMemberCounts:
-    """Task001 AC-4 test_other_enums_member_counts"""
-
+class TestOtherEnumsMemberCounts:
     def test_run_mode_has_3_values(self) -> None:
         assert len(RunMode) == 3
 
@@ -91,9 +83,7 @@ class TestTask001AC4OtherEnumsMemberCounts:
         assert len(ReviewStatus) == 2
 
 
-class TestTask001EC1EnumStringSerialization:
-    """Task001 EC-1 test_enum_string_serialization"""
-
+class TestEnumStringSerialization:
     def test_str_returns_value(self) -> None:
         assert str(RunStatus.RECEIVED) == "received"
 
@@ -104,9 +94,7 @@ class TestTask001EC1EnumStringSerialization:
         assert str(EventType.RUN_RECEIVED) == "run.received"
 
 
-class TestTask001EC2EnumHashable:
-    """Task001 EC-2 test_enum_hashable"""
-
+class TestEnumHashable:
     def test_usable_as_dict_key(self) -> None:
         d = {RunStatus.RECEIVED: True}
         assert d[RunStatus.RECEIVED] is True
@@ -117,9 +105,7 @@ class TestTask001EC2EnumHashable:
         assert len(s) == 2
 
 
-class TestTask001ERR1InvalidEnumValueRaises:
-    """Task001 ERR-1 test_invalid_enum_value_raises"""
-
+class TestInvalidEnumValueRaises:
     def test_invalid_run_status_raises(self) -> None:
         with pytest.raises(ValueError, match="nonexistent_status"):
             RunStatus("nonexistent_status")

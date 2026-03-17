@@ -1,4 +1,4 @@
-"""Integration tests for LocalRunner demo paths (Feature 009, Batch 04, Task 004).
+"""Integration tests for LocalRunner demo paths.
 
 Uses real SQLite (in-memory), real repositories, real workflow module,
 and the actual LocalRunner. Verifies event counts, seq ordering, and
@@ -87,12 +87,11 @@ def runner_env():
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-1: Demo 1 — Happy path end-to-end
+# Demo 1 — Happy path end-to-end
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_AC_1_test_demo_1_happy_path(runner_env):
-    """Task004 AC-1 test_demo_1_happy_path"""
+def test_demo_1_happy_path(runner_env):
     runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
@@ -107,12 +106,11 @@ def test_Task004_AC_1_test_demo_1_happy_path(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-2: Demo 2 — Review path end-to-end
+# Demo 2 — Review path end-to-end
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_AC_2_test_demo_2_review_path(runner_env):
-    """Task004 AC-2 test_demo_2_review_path"""
+def test_demo_2_review_path(runner_env):
     runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     # Phase 1: start_run → review_required
@@ -129,12 +127,11 @@ def test_Task004_AC_2_test_demo_2_review_path(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-3: Demo 3 — Validation failure (forbidden system) end-to-end
+# Demo 3 — Validation failure (forbidden system) end-to-end
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_AC_3_test_demo_3_validation_failure_forbidden(runner_env):
-    """Task004 AC-3 test_demo_3_validation_failure_forbidden"""
+def test_demo_3_validation_failure_forbidden(runner_env):
     runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(FORBIDDEN_SYSTEM_JSON, RunMode.LIVE)
@@ -152,12 +149,11 @@ def test_Task004_AC_3_test_demo_3_validation_failure_forbidden(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-4: Demo 4 — Replay end-to-end
+# Demo 4 — Replay end-to-end
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_AC_4_test_demo_4_replay(runner_env):
-    """Task004 AC-4 test_demo_4_replay"""
+def test_demo_4_replay(runner_env):
     runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     # First complete a run
@@ -173,12 +169,11 @@ def test_Task004_AC_4_test_demo_4_replay(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-5: DRY_RUN end-to-end
+# DRY_RUN end-to-end
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_AC_5_test_dry_run_end_to_end(runner_env):
-    """Task004 AC-5 test_dry_run_end_to_end"""
+def test_dry_run_end_to_end(runner_env):
     runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.DRY_RUN)
@@ -193,7 +188,7 @@ def test_Task004_AC_5_test_dry_run_end_to_end(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task004 EC-1: Event count matches expected per path [parametrized]
+# Event count matches expected per path [parametrized]
 # ---------------------------------------------------------------------------
 
 
@@ -206,8 +201,7 @@ def test_Task004_AC_5_test_dry_run_end_to_end(runner_env):
     ],
     ids=["happy_live", "validation_failure", "dry_run"],
 )
-def test_Task004_EC_1_test_event_counts_per_path(runner_env, input_json, mode, expected_count, desc):
-    """Task004 EC-1 test_event_counts_per_path [parametrized]"""
+def test_event_counts_per_path(runner_env, input_json, mode, expected_count, desc):
     runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(input_json, mode)
@@ -216,12 +210,11 @@ def test_Task004_EC_1_test_event_counts_per_path(runner_env, input_json, mode, e
 
 
 # ---------------------------------------------------------------------------
-# Task004 EC-2: Projection stored correctly after completion
+# Projection stored correctly after completion
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_EC_2_test_projection_stored_correctly(runner_env):
-    """Task004 EC-2 test_projection_stored_correctly"""
+def test_projection_stored_correctly(runner_env):
     runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
@@ -236,12 +229,11 @@ def test_Task004_EC_2_test_projection_stored_correctly(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task004 EC-3: Seq numbers contiguous within a run
+# Seq numbers contiguous within a run
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_EC_3_test_seq_numbers_contiguous(runner_env):
-    """Task004 EC-3 test_seq_numbers_contiguous"""
+def test_seq_numbers_contiguous(runner_env):
     runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
@@ -252,12 +244,11 @@ def test_Task004_EC_3_test_seq_numbers_contiguous(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task004 ERR-1: submit_review on completed run raises
+# submit_review on completed run raises
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_ERR_1_test_submit_review_on_completed_run_raises(runner_env):
-    """Task004 ERR-1 test_submit_review_on_completed_run_raises"""
+def test_submit_review_on_completed_run_raises(runner_env):
     runner, run_repo, event_repo, review_repo, _receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
@@ -268,17 +259,16 @@ def test_Task004_ERR_1_test_submit_review_on_completed_run_raises(runner_env):
 
 
 # ===========================================================================
-# Feature 013 Batch 03 — End-to-end integration tests (Task 003)
+# End-to-end integration tests (Task 003)
 # ===========================================================================
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-1: End-to-end happy path with receipt stored
+# End-to-end happy path with receipt stored
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_AC_1_test_e2e_happy_path_receipt_stored(runner_env):
-    """Task003 AC-1 test_e2e_happy_path_receipt_stored"""
+def test_e2e_happy_path_receipt_stored(runner_env):
     runner, run_repo, event_repo, review_repo, receipt_repo = runner_env
 
     result = runner.start_run("New hire needs Salesforce", RunMode.LIVE)
@@ -295,12 +285,11 @@ def test_Task003_AC_1_test_e2e_happy_path_receipt_stored(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-2: End-to-end prompt_version on events
+# End-to-end prompt_version on events
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_AC_2_test_e2e_prompt_version_on_events(runner_env):
-    """Task003 AC-2 test_e2e_prompt_version_on_events"""
+def test_e2e_prompt_version_on_events(runner_env):
     runner, run_repo, event_repo, review_repo, receipt_repo = runner_env
 
     result = runner.start_run("New hire needs Salesforce", RunMode.LIVE)
@@ -313,12 +302,11 @@ def test_Task003_AC_2_test_e2e_prompt_version_on_events(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-3: End-to-end review path with receipt stored
+# End-to-end review path with receipt stored
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_AC_3_test_e2e_review_path_receipt_stored(runner_env):
-    """Task003 AC-3 test_e2e_review_path_receipt_stored"""
+def test_e2e_review_path_receipt_stored(runner_env):
     runner, run_repo, event_repo, review_repo, receipt_repo = runner_env
 
     result1 = runner.start_run(REVIEW_REQUIRED_JSON, RunMode.LIVE)
@@ -334,12 +322,11 @@ def test_Task003_AC_3_test_e2e_review_path_receipt_stored(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task003 EC-1: Parse failure still stores receipt
+# Parse failure still stores receipt
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_EC_1_test_e2e_parse_failure_receipt_stored(runner_env):
-    """Task003 EC-1 test_e2e_parse_failure_receipt_stored"""
+def test_e2e_parse_failure_receipt_stored(runner_env):
     runner, run_repo, event_repo, review_repo, receipt_repo = runner_env
 
     result = runner.start_run(PARSE_FAILURE_INPUT, RunMode.LIVE)
@@ -352,12 +339,11 @@ def test_Task003_EC_1_test_e2e_parse_failure_receipt_stored(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task003 EC-2: Receipt raw_response matches LLM output exactly
+# Receipt raw_response matches LLM output exactly
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_EC_2_test_e2e_receipt_matches_llm_output(runner_env):
-    """Task003 EC-2 test_e2e_receipt_matches_llm_output"""
+def test_e2e_receipt_matches_llm_output(runner_env):
     runner, run_repo, event_repo, review_repo, receipt_repo = runner_env
 
     result = runner.start_run(HAPPY_PATH_JSON, RunMode.LIVE)
@@ -369,12 +355,11 @@ def test_Task003_EC_2_test_e2e_receipt_matches_llm_output(runner_env):
 
 
 # ---------------------------------------------------------------------------
-# Task003 ERR-1: LLM error prevents receipt storage
+# LLM error prevents receipt storage
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_ERR_1_test_e2e_llm_error_no_receipt():
-    """Task003 ERR-1 test_e2e_llm_error_no_receipt"""
+def test_e2e_llm_error_no_receipt():
     from unittest.mock import MagicMock
 
     from app.llm.base import LLMAdapterError

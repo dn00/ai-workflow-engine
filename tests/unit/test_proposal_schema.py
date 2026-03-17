@@ -1,4 +1,4 @@
-"""Tests for Proposal schema (Feature 002, Task 003)."""
+"""Tests for Proposal schema."""
 
 import pytest
 from pydantic import ValidationError
@@ -19,9 +19,7 @@ FULL_SAMPLE = {
 }
 
 
-class TestTask003AC1ProposalFullSample:
-    """Task003 AC-1 test_proposal_full_sample"""
-
+class TestProposalFullSample:
     def test_full_sample_validates(self) -> None:
         p = Proposal(**FULL_SAMPLE)
         assert p.request_type == "access_request"
@@ -35,9 +33,7 @@ class TestTask003AC1ProposalFullSample:
         assert p.notes == ["Employee start date is near-term"]
 
 
-class TestTask003AC2ProposalPartialData:
-    """Task003 AC-2 test_proposal_partial_data"""
-
+class TestProposalPartialData:
     def test_partial_data_validates(self) -> None:
         p = Proposal(request_type="access_request", employee_name="Jane Doe")
         assert p.request_type == "access_request"
@@ -47,9 +43,7 @@ class TestTask003AC2ProposalPartialData:
         assert p.urgency is None
 
 
-class TestTask003AC3ProposalJsonRoundtrip:
-    """Task003 AC-3 test_proposal_json_roundtrip"""
-
+class TestProposalJsonRoundtrip:
     def test_roundtrip(self) -> None:
         original = Proposal(**FULL_SAMPLE)
         dumped = original.model_dump()
@@ -57,18 +51,14 @@ class TestTask003AC3ProposalJsonRoundtrip:
         assert original == reconstructed
 
 
-class TestTask003EC1ProposalEmptyLists:
-    """Task003 EC-1 test_proposal_empty_lists"""
-
+class TestProposalEmptyLists:
     def test_empty_lists_preserved(self) -> None:
         p = Proposal(systems_requested=[], notes=[])
         assert p.systems_requested == []
         assert p.notes == []
 
 
-class TestTask003EC2ProposalAllNone:
-    """Task003 EC-2 test_proposal_all_none"""
-
+class TestProposalAllNone:
     def test_all_none(self) -> None:
         p = Proposal()
         assert p.request_type is None
@@ -82,9 +72,7 @@ class TestTask003EC2ProposalAllNone:
         assert p.notes is None
 
 
-class TestTask003ERR1ProposalWrongTypes:
-    """Task003 ERR-1 test_proposal_wrong_types"""
-
+class TestProposalWrongTypes:
     def test_wrong_type_raises(self) -> None:
         with pytest.raises(ValidationError) as exc_info:
             Proposal(systems_requested="not-a-list")

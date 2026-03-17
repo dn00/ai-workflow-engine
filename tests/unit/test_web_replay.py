@@ -1,6 +1,4 @@
 """Tests for web UI replay result view.
-
-Feature 016, Batch 02, Task 003.
 """
 
 import pytest
@@ -26,12 +24,11 @@ def _create_run(client: TestClient) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-1: Replay triggers and renders
+# Replay triggers and renders
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_AC_1_test_replay_renders_result(client: TestClient):
-    """Task003 AC-1 test_replay_renders_result"""
+def test_replay_renders_result(client: TestClient):
     run_id = _create_run(client)
 
     resp = client.post(f"/ui/runs/{run_id}/replay", follow_redirects=False)
@@ -43,12 +40,11 @@ def test_Task003_AC_1_test_replay_renders_result(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-2: Match status displayed
+# Match status displayed
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_AC_2_test_replay_shows_match_status(client: TestClient):
-    """Task003 AC-2 test_replay_shows_match_status"""
+def test_replay_shows_match_status(client: TestClient):
     run_id = _create_run(client)
 
     resp = client.post(f"/ui/runs/{run_id}/replay")
@@ -58,12 +54,11 @@ def test_Task003_AC_2_test_replay_shows_match_status(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-3: Projections displayed
+# Projections displayed
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_AC_3_test_replay_shows_projections(client: TestClient):
-    """Task003 AC-3 test_replay_shows_projections"""
+def test_replay_shows_projections(client: TestClient):
     run_id = _create_run(client)
 
     resp = client.post(f"/ui/runs/{run_id}/replay")
@@ -73,12 +68,11 @@ def test_Task003_AC_3_test_replay_shows_projections(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task003 EC-1: Replay with no stored projection
+# Replay with no stored projection
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_EC_1_test_replay_no_stored_projection(client: TestClient):
-    """Task003 EC-1 test_replay_no_stored_projection"""
+def test_replay_no_stored_projection(client: TestClient):
     from app.core.replay.models import ReplayResult
 
     run_id = _create_run(client)
@@ -101,12 +95,11 @@ def test_Task003_EC_1_test_replay_no_stored_projection(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task003 ERR-1: Replay of unknown run_id
+# Replay of unknown run_id
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_ERR_1_test_replay_unknown_run(client: TestClient):
-    """Task003 ERR-1 test_replay_unknown_run"""
+def test_replay_unknown_run(client: TestClient):
     resp = client.post("/ui/runs/nonexistent-id/replay", follow_redirects=False)
     assert resp.status_code == 200
     html = resp.text

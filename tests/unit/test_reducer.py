@@ -1,4 +1,4 @@
-"""Tests for reducer-projection (Feature 008, Batch 01, Task 001)."""
+"""Tests for reducer-projection."""
 
 from datetime import datetime, timezone
 
@@ -87,9 +87,7 @@ def _rejection_events(run_id: str = "run-1") -> list[Event]:
 # ---------------------------------------------------------------------------
 
 
-class TestTask001AC1AutoApprovePath:
-    """Task001 AC-1 test_auto_approve_path_produces_correct_projection"""
-
+class TestAutoApprovePath:
     def test_auto_approve_path_produces_correct_projection(self) -> None:
         events = _auto_approve_events()
         proj = reduce_events(events)
@@ -104,9 +102,7 @@ class TestTask001AC1AutoApprovePath:
         assert proj.event_count == 7
 
 
-class TestTask001AC2ReviewApprovePath:
-    """Task001 AC-2 test_review_approve_path_produces_correct_projection"""
-
+class TestReviewApprovePath:
     def test_review_approve_path_produces_correct_projection(self) -> None:
         events = _review_approve_events()
         proj = reduce_events(events)
@@ -116,9 +112,7 @@ class TestTask001AC2ReviewApprovePath:
         assert proj.review_decision == "approve"
 
 
-class TestTask001AC3RejectionPath:
-    """Task001 AC-3 test_rejection_path_produces_correct_projection"""
-
+class TestRejectionPath:
     def test_rejection_path_produces_correct_projection(self) -> None:
         events = _rejection_events()
         proj = reduce_events(events)
@@ -129,9 +123,7 @@ class TestTask001AC3RejectionPath:
         assert proj.policy_decision["status"] == "rejected"
 
 
-class TestTask001AC4ParseFailure:
-    """Task001 AC-4 test_parse_failure_produces_correct_projection"""
-
+class TestParseFailure:
     def test_parse_failure_produces_correct_projection(self) -> None:
         events = [
             _make_event("run-1", 1, EventType.RUN_RECEIVED),
@@ -143,9 +135,7 @@ class TestTask001AC4ParseFailure:
         assert proj.error == {"error": "bad json"}
 
 
-class TestTask001AC5ValidationFailure:
-    """Task001 AC-5 test_validation_failure_produces_correct_projection"""
-
+class TestValidationFailure:
     def test_validation_failure_produces_correct_projection(self) -> None:
         events = [
             _make_event("run-1", 1, EventType.RUN_RECEIVED),
@@ -158,9 +148,7 @@ class TestTask001AC5ValidationFailure:
         assert proj.error == {"reason": "invalid field"}
 
 
-class TestTask001AC6EventTypeStatusMapping:
-    """Task001 AC-6 test_each_event_type_maps_to_correct_status"""
-
+class TestEventTypeStatusMapping:
     def test_direct_mapped_types(self) -> None:
         """All 11 direct-mapped event types produce correct RunStatus."""
         for event_type, expected_status in EVENT_STATUS_MAP.items():
@@ -210,9 +198,7 @@ class TestTask001AC6EventTypeStatusMapping:
         assert proj.status == RunStatus.REJECTED
 
 
-class TestTask001AC7ProjectionSerializesToJson:
-    """Task001 AC-7 test_projection_serializes_to_json_dict"""
-
+class TestProjectionSerializesToJson:
     def test_projection_serializes_to_json_dict(self) -> None:
         events = _auto_approve_events()
         proj = reduce_events(events)
@@ -231,9 +217,7 @@ class TestTask001AC7ProjectionSerializesToJson:
             assert field in dumped
 
 
-class TestTask001AC8DeterministicOutput:
-    """Task001 AC-8 test_deterministic_output"""
-
+class TestDeterministicOutput:
     def test_deterministic_output(self) -> None:
         events = _auto_approve_events()
         proj1 = reduce_events(events)
@@ -246,17 +230,13 @@ class TestTask001AC8DeterministicOutput:
 # ---------------------------------------------------------------------------
 
 
-class TestTask001EC1EmptyEventList:
-    """Task001 EC-1 test_empty_event_list_raises_error"""
-
+class TestEmptyEventList:
     def test_empty_event_list_raises_error(self) -> None:
         with pytest.raises(ReducerError, match="at least one event"):
             reduce_events([])
 
 
-class TestTask001EC2DecisionCommittedMissingStatus:
-    """Task001 EC-2 test_decision_committed_missing_status_raises_error"""
-
+class TestDecisionCommittedMissingStatus:
     def test_decision_committed_missing_status_raises_error(self) -> None:
         events = [
             _make_event("run-1", 1, EventType.DECISION_COMMITTED, {"reason_codes": []}),
@@ -265,9 +245,7 @@ class TestTask001EC2DecisionCommittedMissingStatus:
             reduce_events(events)
 
 
-class TestTask001EC3PartialEventSequence:
-    """Task001 EC-3 test_partial_event_sequence_mid_run"""
-
+class TestPartialEventSequence:
     def test_partial_event_sequence_mid_run(self) -> None:
         events = [
             _make_event("run-1", 1, EventType.RUN_RECEIVED),
@@ -287,9 +265,7 @@ class TestTask001EC3PartialEventSequence:
 # ---------------------------------------------------------------------------
 
 
-class TestTask001ERR1UnknownEventType:
-    """Task001 ERR-1 test_unknown_event_type_raises_error"""
-
+class TestUnknownEventType:
     def test_unknown_event_type_raises_error(self) -> None:
         # Use model_construct to bypass Pydantic enum validation
         event = Event.model_construct(
@@ -307,9 +283,7 @@ class TestTask001ERR1UnknownEventType:
             reduce_events([event])
 
 
-class TestTask001ERR2MixedRunIds:
-    """Task001 ERR-2 test_mixed_run_ids_raises_error"""
-
+class TestMixedRunIds:
     def test_mixed_run_ids_raises_error(self) -> None:
         events = [
             _make_event("run-1", 1, EventType.RUN_RECEIVED),

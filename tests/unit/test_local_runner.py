@@ -1,4 +1,4 @@
-"""Tests for LocalRunner start_run + helpers (Feature 009, Batch 02, Task 002)."""
+"""Tests for LocalRunner start_run + helpers."""
 
 from datetime import datetime, timezone
 from types import ModuleType
@@ -122,12 +122,11 @@ def _make_effect_adapter():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-1: start_run happy path (approved, LIVE)
+# start_run happy path (approved, LIVE)
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_1_test_start_run_happy_path_approved_live():
-    """Task002 AC-1 test_start_run_happy_path_approved_live"""
+def test_start_run_happy_path_approved_live():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
@@ -156,12 +155,11 @@ def test_Task002_AC_1_test_start_run_happy_path_approved_live():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-2: start_run parse failure
+# start_run parse failure
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_2_test_start_run_parse_failure():
-    """Task002 AC-2 test_start_run_parse_failure"""
+def test_start_run_parse_failure():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=False)
@@ -185,12 +183,11 @@ def test_Task002_AC_2_test_start_run_parse_failure():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-3: start_run validation failure
+# start_run validation failure
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_3_test_start_run_validation_failure():
-    """Task002 AC-3 test_start_run_validation_failure"""
+def test_start_run_validation_failure():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=False)
@@ -213,12 +210,11 @@ def test_Task002_AC_3_test_start_run_validation_failure():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-4: start_run rejected
+# start_run rejected
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_4_test_start_run_rejected():
-    """Task002 AC-4 test_start_run_rejected"""
+def test_start_run_rejected():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="rejected")
@@ -244,12 +240,11 @@ def test_Task002_AC_4_test_start_run_rejected():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-5: start_run review_required
+# start_run review_required
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_5_test_start_run_review_required():
-    """Task002 AC-5 test_start_run_review_required"""
+def test_start_run_review_required():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="review_required")
@@ -276,12 +271,11 @@ def test_Task002_AC_5_test_start_run_review_required():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-6: start_run DRY_RUN approved
+# start_run DRY_RUN approved
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_6_test_start_run_dry_run_approved():
-    """Task002 AC-6 test_start_run_dry_run_approved"""
+def test_start_run_dry_run_approved():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
@@ -308,12 +302,11 @@ def test_Task002_AC_6_test_start_run_dry_run_approved():
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-1: Seq numbers monotonically increasing
+# Seq numbers monotonically increasing
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_EC_1_test_start_run_seq_numbers_contiguous():
-    """Task002 EC-1 test_start_run_seq_numbers_contiguous"""
+def test_start_run_seq_numbers_contiguous():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
@@ -329,12 +322,11 @@ def test_Task002_EC_1_test_start_run_seq_numbers_contiguous():
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-2: version_info on all events
+# version_info on all events
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_EC_2_test_start_run_version_info_on_all_events():
-    """Task002 EC-2 test_start_run_version_info_on_all_events"""
+def test_start_run_version_info_on_all_events():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
@@ -351,12 +343,11 @@ def test_Task002_EC_2_test_start_run_version_info_on_all_events():
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-3: Idempotency key on effect.requested
+# Idempotency key on effect.requested
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_EC_3_test_start_run_idempotency_key_on_effect_requested():
-    """Task002 EC-3 test_start_run_idempotency_key_on_effect_requested"""
+def test_start_run_idempotency_key_on_effect_requested():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="approved")
@@ -375,12 +366,11 @@ def test_Task002_EC_3_test_start_run_idempotency_key_on_effect_requested():
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-1: REPLAY mode raises RunnerError
+# REPLAY mode raises RunnerError
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_ERR_1_test_start_run_replay_mode_raises():
-    """Task002 ERR-1 test_start_run_replay_mode_raises"""
+def test_start_run_replay_mode_raises():
     run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
 
@@ -392,12 +382,11 @@ def test_Task002_ERR_1_test_start_run_replay_mode_raises():
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-2: Unknown workflow_type raises RunnerError
+# Unknown workflow_type raises RunnerError
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_ERR_2_test_start_run_unknown_workflow_type_raises():
-    """Task002 ERR-2 test_start_run_unknown_workflow_type_raises"""
+def test_start_run_unknown_workflow_type_raises():
     run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
 
@@ -414,17 +403,16 @@ def test_Task002_ERR_2_test_start_run_unknown_workflow_type_raises():
 
 
 # ===========================================================================
-# Feature 013 Batch 02 — Runner integration (Task 002)
+# Runner integration (Task 002)
 # ===========================================================================
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-1: start_run calls LLM and stores receipt
+# start_run calls LLM and stores receipt
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_1_test_start_run_calls_llm_and_stores_receipt():
-    """Task002 AC-1 test_start_run_calls_llm_and_stores_receipt"""
+def test_start_run_calls_llm_and_stores_receipt():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -444,12 +432,11 @@ def test_Task002_AC_1_test_start_run_calls_llm_and_stores_receipt():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-2: start_run wires prompt_version from LLM response
+# start_run wires prompt_version from LLM response
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_2_test_start_run_wires_prompt_version():
-    """Task002 AC-2 test_start_run_wires_prompt_version"""
+def test_start_run_wires_prompt_version():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -466,12 +453,11 @@ def test_Task002_AC_2_test_start_run_wires_prompt_version():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-3: start_run passes LLM response to parser, not input_text
+# start_run passes LLM response to parser, not input_text
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_3_test_start_run_passes_llm_response_to_parser():
-    """Task002 AC-3 test_start_run_passes_llm_response_to_parser"""
+def test_start_run_passes_llm_response_to_parser():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -490,12 +476,11 @@ def test_Task002_AC_3_test_start_run_passes_llm_response_to_parser():
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-1: DRY_RUN mode calls LLM and stores receipt
+# DRY_RUN mode calls LLM and stores receipt
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_EC_1_test_start_run_dry_run_calls_llm():
-    """Task002 EC-1 test_start_run_dry_run_calls_llm"""
+def test_start_run_dry_run_calls_llm():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -512,12 +497,11 @@ def test_Task002_EC_1_test_start_run_dry_run_calls_llm():
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-2: Parse failure stores receipt before failing
+# Parse failure stores receipt before failing
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_EC_2_test_start_run_parse_failure_stores_receipt():
-    """Task002 EC-2 test_start_run_parse_failure_stores_receipt"""
+def test_start_run_parse_failure_stores_receipt():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -533,12 +517,11 @@ def test_Task002_EC_2_test_start_run_parse_failure_stores_receipt():
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-1: LLM adapter error raised as RunnerError
+# LLM adapter error raised as RunnerError
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_ERR_1_test_start_run_llm_error_raises_runner_error():
-    """Task002 ERR-1 test_start_run_llm_error_raises_runner_error"""
+def test_start_run_llm_error_raises_runner_error():
     run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MagicMock()
@@ -552,7 +535,7 @@ def test_Task002_ERR_1_test_start_run_llm_error_raises_runner_error():
 
 
 # ===========================================================================
-# Batch 03 — submit_review + replay_run tests (Task 003)
+# submit_review + replay_run tests
 # ===========================================================================
 
 
@@ -577,12 +560,11 @@ def _start_run_to_review_dry(runner, events_list):
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-1: submit_review approve resumes and completes (LIVE)
+# submit_review approve resumes and completes (LIVE)
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_AC_1_test_submit_review_approve_live():
-    """Task003 AC-1 test_submit_review_approve_live"""
+def test_submit_review_approve_live():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -611,12 +593,11 @@ def test_Task003_AC_1_test_submit_review_approve_live():
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-2: submit_review reject completes without effect
+# submit_review reject completes without effect
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_AC_2_test_submit_review_reject():
-    """Task003 AC-2 test_submit_review_reject"""
+def test_submit_review_reject():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -643,12 +624,11 @@ def test_Task003_AC_2_test_submit_review_reject():
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-3: submit_review updates ReviewTask
+# submit_review updates ReviewTask
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_AC_3_test_submit_review_updates_review_task():
-    """Task003 AC-3 test_submit_review_updates_review_task"""
+def test_submit_review_updates_review_task():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -671,12 +651,11 @@ def test_Task003_AC_3_test_submit_review_updates_review_task():
 
 
 # ---------------------------------------------------------------------------
-# Task003 AC-4: replay_run returns ReplayResult
+# replay_run returns ReplayResult
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_AC_4_test_replay_run_delegates_to_engine():
-    """Task003 AC-4 test_replay_run_delegates_to_engine"""
+def test_replay_run_delegates_to_engine():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -703,12 +682,11 @@ def test_Task003_AC_4_test_replay_run_delegates_to_engine():
 
 
 # ---------------------------------------------------------------------------
-# Task003 EC-1: submit_review approve in DRY_RUN mode
+# submit_review approve in DRY_RUN mode
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_EC_1_test_submit_review_approve_dry_run():
-    """Task003 EC-1 test_submit_review_approve_dry_run"""
+def test_submit_review_approve_dry_run():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -736,12 +714,11 @@ def test_Task003_EC_1_test_submit_review_approve_dry_run():
 
 
 # ---------------------------------------------------------------------------
-# Task003 EC-2: replay_run with no events
+# replay_run with no events
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_EC_2_test_replay_run_no_events():
-    """Task003 EC-2 test_replay_run_no_events"""
+def test_replay_run_no_events():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -760,12 +737,11 @@ def test_Task003_EC_2_test_replay_run_no_events():
 
 
 # ---------------------------------------------------------------------------
-# Task003 ERR-1: submit_review on non-review_required status
+# submit_review on non-review_required status
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_ERR_1_test_submit_review_wrong_status_raises():
-    """Task003 ERR-1 test_submit_review_wrong_status_raises"""
+def test_submit_review_wrong_status_raises():
     run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -780,12 +756,11 @@ def test_Task003_ERR_1_test_submit_review_wrong_status_raises():
 
 
 # ---------------------------------------------------------------------------
-# Task003 ERR-2: submit_review on unknown run_id
+# submit_review on unknown run_id
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_ERR_2_test_submit_review_unknown_run_raises():
-    """Task003 ERR-2 test_submit_review_unknown_run_raises"""
+def test_submit_review_unknown_run_raises():
     run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()
@@ -799,12 +774,11 @@ def test_Task003_ERR_2_test_submit_review_unknown_run_raises():
 
 
 # ---------------------------------------------------------------------------
-# Task003 ERR-3: replay_run on unknown run_id
+# replay_run on unknown run_id
 # ---------------------------------------------------------------------------
 
 
-def test_Task003_ERR_3_test_replay_run_unknown_run_raises():
-    """Task003 ERR-3 test_replay_run_unknown_run_raises"""
+def test_replay_run_unknown_run_raises():
     run_repo, event_repo, review_repo, receipt_repo, _ = _make_repos()
     adapter = _make_effect_adapter()
     llm_adapter = MockLLMAdapter()

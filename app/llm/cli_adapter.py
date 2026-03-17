@@ -12,7 +12,7 @@ from pathlib import Path
 from app.llm.base import AbstractLLMAdapter, LLMAdapterError, LLMResponse
 from app.workflows.registry import get_workflow
 
-_DEFAULT_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "call-claude.py"
+_DEFAULT_SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "call-claude.py"
 
 
 class CliLLMAdapter(AbstractLLMAdapter):

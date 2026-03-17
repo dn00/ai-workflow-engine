@@ -1,4 +1,4 @@
-"""Unit tests for SQLiteEventRepository (Feature 005, Batch 02, Task 003)."""
+"""Unit tests for SQLiteEventRepository."""
 
 from datetime import datetime, timezone
 
@@ -70,9 +70,7 @@ def _make_event(run_id: str = "run-001", seq: int = 0, **overrides) -> Event:
 # ---------------------------------------------------------------------------
 
 
-class TestTask003AC1AppendAndListEvent:
-    """Task003 AC-1 test_append_and_list_event"""
-
+class TestAppendAndListEvent:
     def test_append_persists_event(self, repo, persisted_run) -> None:
         event = _make_event()
         result = repo.append(event)
@@ -83,9 +81,7 @@ class TestTask003AC1AppendAndListEvent:
         assert events[0].event_id == event.event_id
 
 
-class TestTask003AC2ListByRunOrderedBySeq:
-    """Task003 AC-2 test_list_by_run_ordered_by_seq"""
-
+class TestListByRunOrderedBySeq:
     def test_returns_events_sorted_by_seq(self, repo, persisted_run) -> None:
         repo.append(_make_event(seq=0, event_id="evt-0"))
         repo.append(_make_event(seq=2, event_id="evt-2"))
@@ -95,9 +91,7 @@ class TestTask003AC2ListByRunOrderedBySeq:
         assert [e.seq for e in events] == [0, 1, 2]
 
 
-class TestTask003AC3RoundTripAllFields:
-    """Task003 AC-3 test_round_trip_all_fields"""
-
+class TestRoundTripAllFields:
     def test_all_9_fields_preserved(self, repo, persisted_run) -> None:
         event = _make_event(
             event_id="evt-full",
@@ -134,17 +128,13 @@ class TestTask003AC3RoundTripAllFields:
 # ---------------------------------------------------------------------------
 
 
-class TestTask003EC1ListEmptyReturnsEmptyList:
-    """Task003 EC-1 test_list_empty_returns_empty_list"""
-
+class TestListEmptyReturnsEmptyList:
     def test_no_events_returns_empty_list(self, repo) -> None:
         result = repo.list_by_run("run-with-no-events")
         assert result == []
 
 
-class TestTask003EC2SequentialSeqValues:
-    """Task003 EC-2 test_sequential_seq_values"""
-
+class TestSequentialSeqValues:
     def test_sequential_appends_succeed(self, repo, persisted_run) -> None:
         repo.append(_make_event(seq=0, event_id="evt-0"))
         repo.append(_make_event(seq=1, event_id="evt-1"))
@@ -155,9 +145,7 @@ class TestTask003EC2SequentialSeqValues:
         assert [e.seq for e in events] == [0, 1, 2]
 
 
-class TestTask003EC3IndependentSequencesPerRun:
-    """Task003 EC-3 test_independent_sequences_per_run"""
-
+class TestIndependentSequencesPerRun:
     def test_different_runs_have_independent_seqs(self, repo, run_repo) -> None:
         # Create second run
         run_b = Run(
@@ -192,18 +180,14 @@ class TestTask003EC3IndependentSequencesPerRun:
 # ---------------------------------------------------------------------------
 
 
-class TestTask003ERR1DuplicateSeqRaisesIntegrityError:
-    """Task003 ERR-1 test_duplicate_seq_raises_integrity_error"""
-
+class TestDuplicateSeqRaisesIntegrityError:
     def test_duplicate_run_seq_raises(self, repo, persisted_run) -> None:
         repo.append(_make_event(seq=0, event_id="evt-first"))
         with pytest.raises(IntegrityError):
             repo.append(_make_event(seq=0, event_id="evt-dup"))
 
 
-class TestTask003ERR2NoUpdateDeleteMethods:
-    """Task003 ERR-2 test_no_update_delete_methods"""
-
+class TestNoUpdateDeleteMethods:
     def test_no_mutation_methods_on_event_repo(self, repo) -> None:
         forbidden = ["update", "delete", "remove", "modify"]
         for method_name in forbidden:

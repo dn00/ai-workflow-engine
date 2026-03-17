@@ -1,4 +1,4 @@
-"""Golden tests for policy pipeline (Feature 007, Task 002)."""
+"""Golden tests for policy pipeline."""
 
 import json
 from pathlib import Path
@@ -30,9 +30,7 @@ def _run_pipeline(data: dict):
     return evaluate_policy(parse_result.proposal, normalized, validation)
 
 
-class TestTask002AC6GoldenAutoApprove:
-    """Task002 AC-6 test_golden_auto_approve"""
-
+class TestGoldenAutoApprove:
     def test_golden_auto_approve(self) -> None:
         fixture = _load_fixture("auto_approve.json")
         decision = _run_pipeline(fixture["input"])
@@ -61,9 +59,7 @@ class TestTask002AC6GoldenAutoApprove:
         assert decision.allowed_actions == expected["allowed_actions"]
 
 
-class TestTask002ERR1GoldenMalformedProposal:
-    """Task002 ERR-1 test_golden_malformed_proposal"""
-
+class TestGoldenMalformedProposal:
     def test_golden_malformed_proposal(self) -> None:
         fixture = _load_fixture("malformed_proposal.json")
         parse_result = parse_proposal(fixture["input_raw"])

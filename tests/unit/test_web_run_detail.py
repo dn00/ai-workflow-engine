@@ -1,6 +1,4 @@
 """Tests for web UI run detail + event log + review action.
-
-Feature 016, Batch 02, Task 002.
 """
 
 import pytest
@@ -50,12 +48,11 @@ def _create_review_required_run(client: TestClient) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-1: Run detail shows summary
+# Run detail shows summary
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_1_test_run_detail_shows_summary(client: TestClient):
-    """Task002 AC-1 test_run_detail_shows_summary"""
+def test_run_detail_shows_summary(client: TestClient):
     run_id = _create_run(client)
 
     resp = client.get(f"/ui/runs/{run_id}")
@@ -68,12 +65,11 @@ def test_Task002_AC_1_test_run_detail_shows_summary(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-2: Run detail shows proposal receipt
+# Run detail shows proposal receipt
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_2_test_run_detail_shows_receipt(client: TestClient):
-    """Task002 AC-2 test_run_detail_shows_receipt"""
+def test_run_detail_shows_receipt(client: TestClient):
     run_id = _create_run(client)
 
     resp = client.get(f"/ui/runs/{run_id}")
@@ -84,12 +80,11 @@ def test_Task002_AC_2_test_run_detail_shows_receipt(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-3: Event log shows ordered events
+# Event log shows ordered events
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_3_test_run_detail_shows_events_ordered(client: TestClient):
-    """Task002 AC-3 test_run_detail_shows_events_ordered"""
+def test_run_detail_shows_events_ordered(client: TestClient):
     run_id = _create_run(client)
 
     resp = client.get(f"/ui/runs/{run_id}")
@@ -103,12 +98,11 @@ def test_Task002_AC_3_test_run_detail_shows_events_ordered(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-4: Review buttons conditional
+# Review buttons conditional
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_4_test_review_buttons_conditional(client: TestClient):
-    """Task002 AC-4 test_review_buttons_conditional"""
+def test_review_buttons_conditional(client: TestClient):
     # Completed run should NOT show review buttons
     completed_run_id = _create_run(client)
     resp = client.get(f"/ui/runs/{completed_run_id}")
@@ -124,12 +118,11 @@ def test_Task002_AC_4_test_review_buttons_conditional(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-5: Review submission works
+# Review submission works
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_AC_5_test_review_submission_redirects(client: TestClient):
-    """Task002 AC-5 test_review_submission_redirects"""
+def test_review_submission_redirects(client: TestClient):
     run_id = _create_review_required_run(client)
 
     resp = client.post(
@@ -148,12 +141,11 @@ def test_Task002_AC_5_test_review_submission_redirects(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-1: Run with no receipt
+# Run with no receipt
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_EC_1_test_run_detail_no_receipt(client: TestClient):
-    """Task002 EC-1 test_run_detail_no_receipt"""
+def test_run_detail_no_receipt(client: TestClient):
     from unittest.mock import MagicMock
 
     # Create a run that fails at parse (before receipt would normally be created)
@@ -178,12 +170,11 @@ def test_Task002_EC_1_test_run_detail_no_receipt(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-2: Policy/validation info from event payloads
+# Policy/validation info from event payloads
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_EC_2_test_run_detail_shows_policy_info(client: TestClient):
-    """Task002 EC-2 test_run_detail_shows_policy_info"""
+def test_run_detail_shows_policy_info(client: TestClient):
     run_id = _create_run(client)
 
     resp = client.get(f"/ui/runs/{run_id}")
@@ -194,24 +185,22 @@ def test_Task002_EC_2_test_run_detail_shows_policy_info(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-1: Unknown run_id
+# Unknown run_id
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_ERR_1_test_run_detail_unknown_id(client: TestClient):
-    """Task002 ERR-1 test_run_detail_unknown_id"""
+def test_run_detail_unknown_id(client: TestClient):
     resp = client.get("/ui/runs/nonexistent-id")
     assert resp.status_code == 404
     assert "not found" in resp.text.lower()
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-2: Review on non-reviewable run
+# Review on non-reviewable run
 # ---------------------------------------------------------------------------
 
 
-def test_Task002_ERR_2_test_review_wrong_status(client: TestClient):
-    """Task002 ERR-2 test_review_wrong_status"""
+def test_review_wrong_status(client: TestClient):
     run_id = _create_run(client)  # completed run
 
     resp = client.post(

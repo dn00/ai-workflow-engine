@@ -1,4 +1,4 @@
-"""Tests for export_bundle CLI script (Feature 017, Batch 01, Task 002)."""
+"""Tests for export_bundle CLI script."""
 
 import json
 import os
@@ -56,11 +56,10 @@ def _make_bundle(run_id: str = "run-1") -> ReplayBundle:
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-1: Export writes JSON file
+# Export writes JSON file
 # ---------------------------------------------------------------------------
 
 def test_export_writes_json_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """Task002 AC-1 test_export_writes_json_file — export_bundle writes valid JSON."""
     monkeypatch.chdir(tmp_path)
     bundle = _make_bundle("test-run")
 
@@ -81,11 +80,10 @@ def test_export_writes_json_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-2: Export contains bundle fields
+# Export contains bundle fields
 # ---------------------------------------------------------------------------
 
 def test_export_contains_bundle_fields(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """Task002 AC-2 test_export_contains_bundle_fields — JSON has all ReplayBundle keys."""
     monkeypatch.chdir(tmp_path)
     bundle = _make_bundle("test-run")
 
@@ -107,11 +105,10 @@ def test_export_contains_bundle_fields(tmp_path: Path, monkeypatch: pytest.Monke
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-1: DB_URL override
+# DB_URL override
 # ---------------------------------------------------------------------------
 
 def test_export_custom_db_url(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """Task002 EC-1 test_export_custom_db_url — DB_URL env var is respected."""
     monkeypatch.chdir(tmp_path)
     bundle = _make_bundle("test-run")
     custom_url = "sqlite:///custom/path.db"
@@ -131,11 +128,10 @@ def test_export_custom_db_url(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-2: bundles/ dir doesn't exist
+# bundles/ dir doesn't exist
 # ---------------------------------------------------------------------------
 
 def test_export_creates_bundles_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """Task002 EC-2 test_export_creates_bundles_dir — bundles/ dir created if missing."""
     monkeypatch.chdir(tmp_path)
     bundle = _make_bundle("test-run")
 
@@ -155,11 +151,10 @@ def test_export_creates_bundles_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPa
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-1: Unknown run_id
+# Unknown run_id
 # ---------------------------------------------------------------------------
 
 def test_export_unknown_run_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """Task002 ERR-1 test_export_unknown_run_id — BundleError raised for nonexistent run."""
     monkeypatch.chdir(tmp_path)
 
     with patch("scripts.export_bundle.get_engine"), \
@@ -175,11 +170,10 @@ def test_export_unknown_run_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-2: No RUN_ID argument
+# No RUN_ID argument
 # ---------------------------------------------------------------------------
 
 def test_export_no_args_usage():
-    """Task002 ERR-2 test_export_no_args_usage — script exits 1 with usage if no args."""
     result = subprocess.run(
         [sys.executable, "-m", "scripts.export_bundle"],
         capture_output=True,

@@ -1,4 +1,4 @@
-"""Unit tests for DB session management + init + exports (Batch 02, Task 002)."""
+"""Unit tests for DB session management + init + exports."""
 
 import pytest
 from sqlalchemy import Engine, inspect, text
@@ -11,9 +11,7 @@ from app.db.session import get_engine, get_session_factory, init_db
 # ---------------------------------------------------------------------------
 
 
-class TestTask002AC1GetEngineSqlite:
-    """Task002 AC-1 test_get_engine_sqlite"""
-
+class TestGetEngineSqlite:
     def test_returns_engine_instance(self) -> None:
         engine = get_engine("sqlite:///:memory:")
         assert isinstance(engine, Engine)
@@ -25,9 +23,7 @@ class TestTask002AC1GetEngineSqlite:
             assert result.scalar() == 1
 
 
-class TestTask002AC2InitDbCreatesTables:
-    """Task002 AC-2 test_init_db_creates_tables"""
-
+class TestInitDbCreatesTables:
     def test_creates_all_three_tables(self) -> None:
         engine = get_engine("sqlite:///:memory:")
         init_db(engine)
@@ -35,9 +31,7 @@ class TestTask002AC2InitDbCreatesTables:
         assert table_names == ["events", "receipts", "reviews", "runs"]
 
 
-class TestTask002AC3SessionFactoryWorks:
-    """Task002 AC-3 test_session_factory_works"""
-
+class TestSessionFactoryWorks:
     def test_session_can_execute_query(self) -> None:
         engine = get_engine("sqlite:///:memory:")
         init_db(engine)
@@ -52,9 +46,7 @@ class TestTask002AC3SessionFactoryWorks:
 # ---------------------------------------------------------------------------
 
 
-class TestTask002EC1InitDbIdempotent:
-    """Task002 EC-1 test_init_db_idempotent"""
-
+class TestInitDbIdempotent:
     def test_calling_init_db_twice_does_not_raise(self) -> None:
         engine = get_engine("sqlite:///:memory:")
         init_db(engine)
@@ -63,9 +55,7 @@ class TestTask002EC1InitDbIdempotent:
         assert table_names == ["events", "receipts", "reviews", "runs"]
 
 
-class TestTask002EC2ModuleExports:
-    """Task002 EC-2 test_module_exports"""
-
+class TestModuleExports:
     def test_all_public_symbols_importable_from_app_db(self) -> None:
         from app.db import (
             Base,
@@ -92,9 +82,7 @@ class TestTask002EC2ModuleExports:
 # ---------------------------------------------------------------------------
 
 
-class TestTask002ERR1GetEngineInvalidUrl:
-    """Task002 ERR-1 test_get_engine_invalid_url"""
-
+class TestGetEngineInvalidUrl:
     def test_malformed_url_raises(self) -> None:
         with pytest.raises(ArgumentError):
             get_engine("not-a-valid-url")

@@ -1,7 +1,4 @@
 """DoD audit tests — programmatic verification of spec §36 Definition of Done criteria.
-
-Feature 018, Batch 01, Task 002 (AC-5).
-Task002 AC-5 `test_dod_*` (11 individual tests)
 Each test maps to one of the 11 automatable §36 DoD criteria.
 Tests use TestClient + create_app with in-memory SQLite and configured MockLLMAdapter.
 """
@@ -71,7 +68,6 @@ def client():
 
 
 def test_dod_1_submit_plain_text(client: TestClient):
-    """Task002 AC-5 test_dod_1 — POST /runs with input_text returns 201."""
     resp = client.post("/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"})
     assert resp.status_code == 201
     assert "run" in resp.json()
@@ -83,7 +79,6 @@ def test_dod_1_submit_plain_text(client: TestClient):
 
 
 def test_dod_2_proposal_receipt(client: TestClient):
-    """Task002 AC-5 test_dod_2 — response contains run status beyond 'received'."""
     resp = client.post("/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"})
     assert resp.status_code == 201
     status = resp.json()["run"]["status"]
@@ -96,7 +91,6 @@ def test_dod_2_proposal_receipt(client: TestClient):
 
 
 def test_dod_3_deterministic_rules(client: TestClient):
-    """Task002 AC-5 test_dod_3 — run reaches approved/review_required/rejected."""
     # Happy path → completed (auto-approved)
     resp1 = client.post("/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"})
     assert resp1.json()["run"]["status"] == "completed"
@@ -117,7 +111,6 @@ def test_dod_3_deterministic_rules(client: TestClient):
 
 
 def test_dod_4_local_runner_orchestrates(client: TestClient):
-    """Task002 AC-5 test_dod_4 — run reaches terminal state."""
     resp = client.post("/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"})
     assert resp.status_code == 201
     run_id = resp.json()["run"]["run_id"]
@@ -133,7 +126,6 @@ def test_dod_4_local_runner_orchestrates(client: TestClient):
 
 
 def test_dod_5_event_history(client: TestClient):
-    """Task002 AC-5 test_dod_5 — GET /runs/{id}/events returns events."""
     resp = client.post("/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"})
     run_id = resp.json()["run"]["run_id"]
 
@@ -149,7 +141,6 @@ def test_dod_5_event_history(client: TestClient):
 
 
 def test_dod_6_review_flow(client: TestClient):
-    """Task002 AC-5 test_dod_6 — POST /runs/{id}/review works on review_required run."""
     resp = client.post("/runs", json={"input_text": REVIEW_PATH_INPUT, "mode": "live"})
     run_id = resp.json()["run"]["run_id"]
     assert resp.json()["run"]["status"] == "review_required"
@@ -165,7 +156,6 @@ def test_dod_6_review_flow(client: TestClient):
 
 
 def test_dod_7_effect_gated(client: TestClient):
-    """Task002 AC-5 test_dod_7 — approved run has effect.simulated event."""
     resp = client.post("/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"})
     run_id = resp.json()["run"]["run_id"]
 
@@ -180,7 +170,6 @@ def test_dod_7_effect_gated(client: TestClient):
 
 
 def test_dod_8_bundle_export(client: TestClient):
-    """Task002 AC-5 test_dod_8 — GET /runs/{id}/bundle returns bundle data."""
     resp = client.post("/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"})
     run_id = resp.json()["run"]["run_id"]
 
@@ -197,7 +186,6 @@ def test_dod_8_bundle_export(client: TestClient):
 
 
 def test_dod_9_replay_reproduces(client: TestClient):
-    """Task002 AC-5 test_dod_9 — POST /runs/{id}/replay returns match: true."""
     resp = client.post("/runs", json={"input_text": HAPPY_PATH_INPUT, "mode": "live"})
     run_id = resp.json()["run"]["run_id"]
 
@@ -212,7 +200,6 @@ def test_dod_9_replay_reproduces(client: TestClient):
 
 
 def test_dod_10_tests_pass():
-    """Task002 AC-5 test_dod_10 — pytest exit code 0 (tests cover invariants)."""
     # Run pytest in a subprocess to verify the test suite passes
     # Use --co (collect-only) to verify test discovery without re-running
     import sys
@@ -234,7 +221,6 @@ def test_dod_10_tests_pass():
 
 
 def test_dod_11_make_demo_no_temporal():
-    """Task002 AC-5 test_dod_11 — Makefile has demo target, no Temporal import."""
     makefile_path = ROOT / "Makefile"
     assert makefile_path.exists(), "Makefile not found"
     makefile = makefile_path.read_text()

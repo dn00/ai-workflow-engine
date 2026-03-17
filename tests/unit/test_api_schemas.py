@@ -1,4 +1,4 @@
-"""Tests for API schemas, dependencies, and app wiring (Feature 014, Batch 01, Task 001)."""
+"""Tests for API schemas, dependencies, and app wiring."""
 
 from datetime import datetime, timezone
 
@@ -10,12 +10,11 @@ from app.core.models import Run
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-1: App starts with lifespan and serves requests
+# App starts with lifespan and serves requests
 # ---------------------------------------------------------------------------
 
 
 def test_app_starts_with_lifespan():
-    """Task001 AC-1 test_app_starts_with_lifespan"""
     from httpx import ASGITransport, AsyncClient
     from app.main import create_app
 
@@ -39,12 +38,11 @@ def test_app_starts_with_lifespan():
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-2: CreateRunRequest validates correct input
+# CreateRunRequest validates correct input
 # ---------------------------------------------------------------------------
 
 
 def test_create_run_request_valid():
-    """Task001 AC-2 test_create_run_request_valid"""
     from app.api.schemas.runs import CreateRunRequest
 
     req = CreateRunRequest(input_text="test request", mode="live")
@@ -57,12 +55,11 @@ def test_create_run_request_valid():
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-3: SubmitReviewRequest validates correct input
+# SubmitReviewRequest validates correct input
 # ---------------------------------------------------------------------------
 
 
 def test_submit_review_request_valid():
-    """Task001 AC-3 test_submit_review_request_valid"""
     from app.api.schemas.runs import SubmitReviewRequest
 
     req = SubmitReviewRequest(decision="approve")
@@ -73,12 +70,11 @@ def test_submit_review_request_valid():
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-4: Response schemas serialize domain models
+# Response schemas serialize domain models
 # ---------------------------------------------------------------------------
 
 
 def test_response_schema_serializes_domain_model():
-    """Task001 AC-4 test_response_schema_serializes_domain_model"""
     from app.api.schemas.runs import RunResponse
 
     now = datetime.now(timezone.utc)
@@ -104,12 +100,11 @@ def test_response_schema_serializes_domain_model():
 
 
 # ---------------------------------------------------------------------------
-# Task001 EC-1: CreateRunRequest defaults mode to "live"
+# CreateRunRequest defaults mode to "live"
 # ---------------------------------------------------------------------------
 
 
 def test_create_run_request_default_mode():
-    """Task001 EC-1 test_create_run_request_default_mode"""
     from app.api.schemas.runs import CreateRunRequest
 
     req = CreateRunRequest(input_text="test")
@@ -117,12 +112,11 @@ def test_create_run_request_default_mode():
 
 
 # ---------------------------------------------------------------------------
-# Task001 ERR-1: CreateRunRequest rejects missing input_text
+# CreateRunRequest rejects missing input_text
 # ---------------------------------------------------------------------------
 
 
 def test_create_run_request_missing_input_text():
-    """Task001 ERR-1 test_create_run_request_missing_input_text"""
     from app.api.schemas.runs import CreateRunRequest
 
     with pytest.raises(ValidationError) as exc_info:

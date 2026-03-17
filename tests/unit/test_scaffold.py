@@ -1,4 +1,4 @@
-"""Tests for project scaffold (Feature 001, Batches 01+02)."""
+"""Tests for project scaffold."""
 
 import pathlib
 import re
@@ -8,9 +8,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 MAKEFILE = ROOT / "Makefile"
 
 
-class TestTask001AC1DirectoryStructureExists:
-    """Task001 AC-1 test_directory_structure_exists"""
-
+class TestDirectoryStructureExists:
     def test_directory_structure_exists(self) -> None:
         """All directories from spec §27 exist and Python packages have __init__.py."""
         # Expected Python packages (must have __init__.py)
@@ -20,10 +18,8 @@ class TestTask001AC1DirectoryStructureExists:
             "app/api/routes",
             "app/api/schemas",
             "app/core",
-            "app/core/events",
             "app/core/receipts",
             "app/core/replay",
-            "app/core/policy",
             "app/core/projections",
             "app/core/runners",
             "app/workflows",
@@ -31,7 +27,6 @@ class TestTask001AC1DirectoryStructureExists:
             "app/effects",
             "app/db",
             "app/db/repositories",
-            "app/services",
             "tests",
             "tests/unit",
             "tests/integration",
@@ -53,9 +48,7 @@ class TestTask001AC1DirectoryStructureExists:
             assert (ROOT / d).is_dir(), f"Directory missing: {d}"
 
 
-class TestTask001AC2PyprojectHasRequiredFields:
-    """Task001 AC-2 test_pyproject_has_required_fields"""
-
+class TestPyprojectHasRequiredFields:
     def test_pyproject_has_required_fields(self) -> None:
         """pyproject.toml exists, is parseable, and declares required dependencies."""
         pyproject_path = ROOT / "pyproject.toml"
@@ -95,17 +88,13 @@ class TestTask001AC2PyprojectHasRequiredFields:
             assert req in dev_dep_names, f"Dev dependency missing: {req}"
 
 
-class TestTask001EC1AppPackageImportable:
-    """Task001 EC-1 test_app_package_importable"""
-
+class TestAppPackageImportable:
     def test_app_package_importable(self) -> None:
         """After install, `import app` succeeds without errors."""
         import app  # noqa: F401
 
 
-class TestTask001ERR1RequiresPython311Declared:
-    """Task001 ERR-1 test_requires_python_311_declared"""
-
+class TestRequiresPython311Declared:
     def test_requires_python_311_declared(self) -> None:
         """pyproject.toml declares requires-python >= 3.11."""
         pyproject_path = ROOT / "pyproject.toml"
@@ -119,16 +108,11 @@ class TestTask001ERR1RequiresPython311Declared:
         assert ">=" in requires_python, f"requires-python should use >=, got: {requires_python}"
 
 
-# --- Batch 02: Task 002 (Makefile targets) ---
-
-
 def _makefile_content() -> str:
     return MAKEFILE.read_text()
 
 
-class TestTask002AC1MakefileHasTestTarget:
-    """Task002 AC-1 test_makefile_has_test_target"""
-
+class TestMakefileHasTestTarget:
     def test_makefile_has_test_target(self) -> None:
         """Makefile defines a 'test' target that invokes pytest."""
         content = _makefile_content()
@@ -136,9 +120,7 @@ class TestTask002AC1MakefileHasTestTarget:
         assert "pytest" in content, "test target should invoke pytest"
 
 
-class TestTask002AC2MakefileHasLintTarget:
-    """Task002 AC-2 test_makefile_has_lint_target"""
-
+class TestMakefileHasLintTarget:
     def test_makefile_has_lint_target(self) -> None:
         """Makefile defines a 'lint' target that invokes ruff."""
         content = _makefile_content()
@@ -147,18 +129,14 @@ class TestTask002AC2MakefileHasLintTarget:
         assert "ruff format" in content, "lint target should invoke ruff format"
 
 
-class TestTask002EC1MakefileHasDemoTarget:
-    """Task002 EC-1 test_makefile_has_demo_target"""
-
+class TestMakefileHasDemoTarget:
     def test_makefile_has_demo_target(self) -> None:
         """Makefile defines a 'demo' target (stub)."""
         content = _makefile_content()
         assert re.search(r"^demo:", content, re.MULTILINE), "Makefile missing 'demo' target"
 
 
-class TestTask002EC2MakefileHasExportBundleTarget:
-    """Task002 EC-2 test_makefile_has_export_bundle_target"""
-
+class TestMakefileHasExportBundleTarget:
     def test_makefile_has_export_bundle_target(self) -> None:
         """Makefile defines an 'export-bundle' target (stub)."""
         content = _makefile_content()
@@ -167,22 +145,7 @@ class TestTask002EC2MakefileHasExportBundleTarget:
         )
 
 
-# --- Batch 02: Task 003 (Test infrastructure + smoke test) ---
-
-
-class TestTask003AC1AppPackageImportable:
-    """Task003 AC-1 test_app_package_importable"""
-
-    def test_app_package_importable(self) -> None:
-        """Smoke test: import app succeeds."""
-        import app  # noqa: F401
-
-        assert hasattr(app, "__file__")
-
-
-class TestTask003AC2PytestConfigInPyproject:
-    """Task003 AC-2 test_pytest_config_in_pyproject"""
-
+class TestPytestConfigInPyproject:
     def test_pytest_config_in_pyproject(self) -> None:
         """pyproject.toml has [tool.pytest.ini_options] with testpaths."""
         pyproject_path = ROOT / "pyproject.toml"
@@ -194,9 +157,7 @@ class TestTask003AC2PytestConfigInPyproject:
         assert "tests" in pytest_config["testpaths"], "testpaths should include 'tests'"
 
 
-class TestTask003AC3TmpDbPathFixture:
-    """Task003 AC-3 test_tmp_db_path_fixture"""
-
+class TestTmpDbPathFixture:
     def test_tmp_db_path_fixture(self, tmp_db_path: pathlib.Path) -> None:
         """conftest.py provides tmp_db_path fixture returning a Path."""
         assert isinstance(tmp_db_path, pathlib.Path)

@@ -1,6 +1,4 @@
 """Tests for run endpoints: POST /runs, GET /runs/{run_id}, GET /runs/{run_id}/events.
-
-Feature 014, Batch 02, Task 002.
 """
 
 import pytest
@@ -17,12 +15,11 @@ def client():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-1: POST /runs creates and returns a completed run
+# POST /runs creates and returns a completed run
 # ---------------------------------------------------------------------------
 
 
 def test_post_runs_happy_path(client: TestClient):
-    """Task002 AC-1 test_post_runs_happy_path"""
     resp = client.post("/runs", json={"input_text": "test input", "mode": "live"})
     assert resp.status_code == 201
     data = resp.json()
@@ -35,12 +32,11 @@ def test_post_runs_happy_path(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-2: GET /runs/{run_id} returns run summary
+# GET /runs/{run_id} returns run summary
 # ---------------------------------------------------------------------------
 
 
 def test_get_run_summary(client: TestClient):
-    """Task002 AC-2 test_get_run_summary"""
     # Create a run first
     create_resp = client.post("/runs", json={"input_text": "test input", "mode": "live"})
     run_id = create_resp.json()["run"]["run_id"]
@@ -58,12 +54,11 @@ def test_get_run_summary(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-3: GET /runs/{run_id}/events returns event list
+# GET /runs/{run_id}/events returns event list
 # ---------------------------------------------------------------------------
 
 
 def test_get_run_events(client: TestClient):
-    """Task002 AC-3 test_get_run_events"""
     create_resp = client.post("/runs", json={"input_text": "test input", "mode": "live"})
     run_id = create_resp.json()["run"]["run_id"]
 
@@ -88,12 +83,11 @@ def test_get_run_events(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-4: POST /runs with mode=dry_run skips effects
+# POST /runs with mode=dry_run skips effects
 # ---------------------------------------------------------------------------
 
 
 def test_post_runs_dry_run(client: TestClient):
-    """Task002 AC-4 test_post_runs_dry_run"""
     resp = client.post("/runs", json={"input_text": "test input", "mode": "dry_run"})
     assert resp.status_code == 201
     data = resp.json()
@@ -107,12 +101,11 @@ def test_post_runs_dry_run(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-1: POST /runs with no mode field defaults to live
+# POST /runs with no mode field defaults to live
 # ---------------------------------------------------------------------------
 
 
 def test_post_runs_default_mode(client: TestClient):
-    """Task002 EC-1 test_post_runs_default_mode"""
     resp = client.post("/runs", json={"input_text": "test input"})
     assert resp.status_code == 201
     data = resp.json()
@@ -120,12 +113,11 @@ def test_post_runs_default_mode(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-2: GET /runs/{run_id}/events returns events for minimal run
+# GET /runs/{run_id}/events returns events for minimal run
 # ---------------------------------------------------------------------------
 
 
 def test_get_events_minimal(client: TestClient):
-    """Task002 EC-2 test_get_events_minimal"""
     create_resp = client.post("/runs", json={"input_text": "test input"})
     run_id = create_resp.json()["run"]["run_id"]
 
@@ -137,36 +129,33 @@ def test_get_events_minimal(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-1: GET /runs/{run_id} returns 404 for unknown run_id
+# GET /runs/{run_id} returns 404 for unknown run_id
 # ---------------------------------------------------------------------------
 
 
 def test_get_run_404(client: TestClient):
-    """Task002 ERR-1 test_get_run_404"""
     resp = client.get("/runs/nonexistent-uuid")
     assert resp.status_code == 404
     assert resp.json()["detail"] == "Run not found: nonexistent-uuid"
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-2: GET /runs/{run_id}/events returns 404 for unknown run_id
+# GET /runs/{run_id}/events returns 404 for unknown run_id
 # ---------------------------------------------------------------------------
 
 
 def test_get_events_404(client: TestClient):
-    """Task002 ERR-2 test_get_events_404"""
     resp = client.get("/runs/nonexistent-uuid/events")
     assert resp.status_code == 404
     assert resp.json()["detail"] == "Run not found: nonexistent-uuid"
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-3: POST /runs returns 400 for mode=replay
+# POST /runs returns 400 for mode=replay
 # ---------------------------------------------------------------------------
 
 
 def test_post_runs_replay_mode_400(client: TestClient):
-    """Task002 ERR-3 test_post_runs_replay_mode_400"""
     resp = client.post("/runs", json={"input_text": "test", "mode": "replay"})
     assert resp.status_code == 400
     assert "replay" in resp.json()["detail"].lower()

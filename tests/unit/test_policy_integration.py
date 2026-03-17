@@ -1,4 +1,4 @@
-"""Integration tests for policy pipeline (Feature 007, Task 002)."""
+"""Integration tests for policy pipeline."""
 
 import json
 
@@ -23,18 +23,14 @@ def _run_pipeline(data: dict) -> tuple:
     return parse_result, decision
 
 
-class TestTask002AC1EvaluatePolicyImportable:
-    """Task002 AC-1 test_evaluate_policy_importable"""
-
+class TestEvaluatePolicyImportable:
     def test_evaluate_policy_importable(self) -> None:
         from app.workflows.access_request import evaluate_policy as ep
 
         assert callable(ep)
 
 
-class TestTask002AC2RegistryHasEvaluatePolicy:
-    """Task002 AC-2 test_registry_has_evaluate_policy"""
-
+class TestRegistryHasEvaluatePolicy:
     def test_registry_has_evaluate_policy(self) -> None:
         from app.workflows.registry import get_workflow
 
@@ -42,9 +38,7 @@ class TestTask002AC2RegistryHasEvaluatePolicy:
         assert callable(getattr(module, "evaluate_policy", None))
 
 
-class TestTask002AC3PipelineAutoApprove:
-    """Task002 AC-3 test_pipeline_auto_approve"""
-
+class TestPipelineAutoApprove:
     def test_pipeline_auto_approve(self) -> None:
         data = {
             "request_type": "access_request",
@@ -63,9 +57,7 @@ class TestTask002AC3PipelineAutoApprove:
         assert decision.allowed_actions == ["create_simulated_approval_task"]
 
 
-class TestTask002AC4PipelineReviewRequired:
-    """Task002 AC-4 test_pipeline_review_required"""
-
+class TestPipelineReviewRequired:
     def test_pipeline_review_required(self) -> None:
         data = {
             "request_type": "access_request",
@@ -83,9 +75,7 @@ class TestTask002AC4PipelineReviewRequired:
         assert AccessRequestReasonCode.HIGH_URGENCY in decision.reason_codes
 
 
-class TestTask002AC5PipelineRejection:
-    """Task002 AC-5 test_pipeline_rejection"""
-
+class TestPipelineRejection:
     def test_pipeline_rejection(self) -> None:
         data = {
             "request_type": "access_request",
@@ -103,9 +93,7 @@ class TestTask002AC5PipelineRejection:
         assert AccessRequestReasonCode.FORBIDDEN_SYSTEM in decision.reason_codes
 
 
-class TestTask002EC1PipelineParseFailure:
-    """Task002 EC-1 test_pipeline_parse_failure"""
-
+class TestPipelineParseFailure:
     def test_pipeline_parse_failure(self) -> None:
         parse_result = parse_proposal("not valid json {{{")
         assert parse_result.success is False
@@ -113,9 +101,7 @@ class TestTask002EC1PipelineParseFailure:
         assert parse_result.error is not None
 
 
-class TestTask002EC2PipelinePartialInput:
-    """Task002 EC-2 test_pipeline_partial_input"""
-
+class TestPipelinePartialInput:
     def test_pipeline_partial_input(self) -> None:
         data = {
             "request_type": "access_request",

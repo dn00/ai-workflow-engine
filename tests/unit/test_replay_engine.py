@@ -1,4 +1,4 @@
-"""Tests for replay-engine (Feature 011, Batch 01, Task 001)."""
+"""Tests for replay-engine."""
 
 from datetime import datetime, timezone
 
@@ -83,8 +83,6 @@ def _review_path_events(run_id: str = "run-1") -> list[Event]:
 # ---------------------------------------------------------------------------
 
 class TestReplayResultModel:
-    """Task001 AC-1 test_replay_result_model_construction"""
-
     def test_replay_result_is_pydantic_basemodel(self) -> None:
         result = ReplayResult(run_id="run-1")
         assert isinstance(result, BaseModel)
@@ -117,8 +115,6 @@ class TestReplayResultModel:
 
 
 class TestReplayProducesProjection:
-    """Task001 AC-2 test_replay_produces_correct_projection"""
-
     def test_replay_produces_correct_projection(self) -> None:
         events = _auto_approve_events("run-1")
         expected = reduce_events(events)
@@ -132,8 +128,6 @@ class TestReplayProducesProjection:
 
 
 class TestReplayDetectsMatch:
-    """Task001 AC-3 test_replay_detects_match"""
-
     def test_replay_detects_match(self) -> None:
         events = _auto_approve_events("run-1")
         projection = reduce_events(events)
@@ -146,8 +140,6 @@ class TestReplayDetectsMatch:
 
 
 class TestReplayDetectsMismatch:
-    """Task001 AC-4 test_replay_detects_mismatch"""
-
     def test_replay_detects_mismatch(self) -> None:
         events = _auto_approve_events("run-1")
         projection = reduce_events(events)
@@ -167,8 +159,6 @@ class TestReplayDetectsMismatch:
 # ---------------------------------------------------------------------------
 
 class TestStoredProjectionNone:
-    """Task001 EC-1 test_stored_projection_none"""
-
     def test_stored_projection_none(self) -> None:
         events = _auto_approve_events("run-1")
 
@@ -180,8 +170,6 @@ class TestStoredProjectionNone:
 
 
 class TestSingleEventReplay:
-    """Task001 EC-2 test_single_event_replay"""
-
     def test_single_event_replay(self) -> None:
         events = [_make_event("run-1", 1, EventType.RUN_RECEIVED)]
         projection = reduce_events(events)
@@ -196,8 +184,6 @@ class TestSingleEventReplay:
 
 
 class TestReviewPathReplay:
-    """Task001 EC-3 test_review_path_replay"""
-
     def test_review_path_replay(self) -> None:
         events = _review_path_events("run-1")
         projection = reduce_events(events)
@@ -216,8 +202,6 @@ class TestReviewPathReplay:
 # ---------------------------------------------------------------------------
 
 class TestEmptyEventsError:
-    """Task001 ERR-1 test_empty_events_error"""
-
     def test_empty_events_error(self) -> None:
         result = replay_run("run-1", [], None)
 
@@ -228,8 +212,6 @@ class TestEmptyEventsError:
 
 
 class TestReducerErrorWrapped:
-    """Task001 ERR-2 test_reducer_error_wrapped"""
-
     def test_reducer_error_wrapped(self) -> None:
         events = [
             _make_event("run-1", 1, EventType.RUN_RECEIVED),

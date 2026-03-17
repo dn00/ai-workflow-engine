@@ -1,4 +1,4 @@
-"""Tests for runner barrel export wiring (Feature 009, Batch 03)."""
+"""Tests for runner barrel export wiring."""
 
 
 def test_runners_package_exports():

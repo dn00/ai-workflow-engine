@@ -1,13 +1,11 @@
-"""Tests for access request workflow types (Feature 006, Task 001)."""
+"""Tests for access request workflow types."""
 
 from app.core.enums import ReasonCode
 from app.workflows.access_request.reason_codes import AccessRequestReasonCode
 from app.workflows.access_request.schema import NormalizedFields
 
 
-class TestTask001AC2AccessRequestReasonCodeHas6Values:
-    """Task001 AC-2 test_access_request_reason_code_has_6_values"""
-
+class TestAccessRequestReasonCodeHas6Values:
     def test_has_6_values(self) -> None:
         assert len(AccessRequestReasonCode) == 6
 
@@ -23,9 +21,7 @@ class TestTask001AC2AccessRequestReasonCodeHas6Values:
         assert {m.value for m in AccessRequestReasonCode} == expected
 
 
-class TestTask001AC3NormalizedFieldsInWorkflowModule:
-    """Task001 AC-3 test_normalized_fields_in_workflow_module"""
-
+class TestNormalizedFieldsInWorkflowModule:
     def test_import_and_construct(self) -> None:
         nf = NormalizedFields(
             employee_name="Jane Doe",
@@ -44,9 +40,7 @@ class TestTask001AC3NormalizedFieldsInWorkflowModule:
         assert nf.manager_name is None
 
 
-class TestTask001EC1StrValuesUnchanged:
-    """Task001 EC-1 test_str_values_unchanged"""
-
+class TestStrValuesUnchanged:
     def test_core_malformed_date_value(self) -> None:
         assert ReasonCode.MALFORMED_DATE.value == "malformed_date"
 

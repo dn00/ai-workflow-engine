@@ -10,9 +10,7 @@ from app.llm.mock_adapter import MockLLMAdapter
 
 
 class TestAbstractAdapterNotInstantiable:
-    # Task001 AC-1 `test_abstract_adapter_not_instantiable`
-    """Task001 AC-1 test_abstract_adapter_not_instantiable"""
-
+    # `test_abstract_adapter_not_instantiable`
     def test_abstract_adapter_not_instantiable(self):
         """AC-1: AbstractLLMAdapter cannot be instantiated directly."""
         with pytest.raises(TypeError):
@@ -20,9 +18,7 @@ class TestAbstractAdapterNotInstantiable:
 
 
 class TestLLMResponseValid:
-    # Task001 AC-2 `test_llm_response_valid`
-    """Task001 AC-2 test_llm_response_valid"""
-
+    # `test_llm_response_valid`
     def test_llm_response_valid(self):
         """AC-2: LLMResponse validates required fields; model_id defaults to None."""
         resp = LLMResponse(raw_response='{"foo": "bar"}', prompt_version="1.0")
@@ -32,9 +28,7 @@ class TestLLMResponseValid:
 
 
 class TestMockAdapterDefaultResponse:
-    # Task001 AC-3 `test_mock_adapter_default_response`
-    """Task001 AC-3 test_mock_adapter_default_response"""
-
+    # `test_mock_adapter_default_response`
     def test_mock_adapter_default_response(self):
         """AC-3: MockLLMAdapter returns valid default JSON with all 9 proposal fields."""
         adapter = MockLLMAdapter()
@@ -56,9 +50,7 @@ class TestMockAdapterDefaultResponse:
 
 
 class TestMockAdapterCustomResponse:
-    # Task001 AC-4 `test_mock_adapter_custom_response`
-    """Task001 AC-4 test_mock_adapter_custom_response"""
-
+    # `test_mock_adapter_custom_response`
     def test_mock_adapter_custom_response(self):
         """AC-4: MockLLMAdapter returns custom responses when configured."""
         adapter = MockLLMAdapter(responses={"special": '{"custom": true}'})
@@ -67,9 +59,7 @@ class TestMockAdapterCustomResponse:
 
 
 class TestLLMAdapterErrorType:
-    # Task001 EC-1 `test_llm_adapter_error_type`
-    """Task001 EC-1 test_llm_adapter_error_type"""
-
+    # `test_llm_adapter_error_type`
     def test_llm_adapter_error_type(self):
         """EC-1: LLMAdapterError is an Exception subclass with preserved message."""
         err = LLMAdapterError("something went wrong")
@@ -78,9 +68,7 @@ class TestLLMAdapterErrorType:
 
 
 class TestMockAdapterUnknownInputFallback:
-    # Task001 EC-2 `test_mock_adapter_unknown_input_fallback`
-    """Task001 EC-2 test_mock_adapter_unknown_input_fallback"""
-
+    # `test_mock_adapter_unknown_input_fallback`
     def test_mock_adapter_unknown_input_fallback(self):
         """EC-2: MockLLMAdapter with unknown input falls back to default response."""
         adapter = MockLLMAdapter(responses={"x": "y"})
@@ -90,9 +78,7 @@ class TestMockAdapterUnknownInputFallback:
 
 
 class TestLLMResponseMissingRawResponse:
-    # Task001 ERR-1 `test_llm_response_missing_raw_response`
-    """Task001 ERR-1 test_llm_response_missing_raw_response"""
-
+    # `test_llm_response_missing_raw_response`
     def test_llm_response_missing_raw_response(self):
         """ERR-1: LLMResponse rejects missing raw_response."""
         with pytest.raises(ValidationError):

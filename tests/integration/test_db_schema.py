@@ -1,4 +1,4 @@
-"""Integration tests for DB schema roundtrip + constraints (Batch 02, Task 003)."""
+"""Integration tests for DB schema roundtrip + constraints."""
 
 from datetime import datetime, timezone
 
@@ -59,9 +59,7 @@ def _make_event(run_id: str = "run-1", seq: int = 1) -> EventRow:
 # ---------------------------------------------------------------------------
 
 
-class TestTask003AC1RunRowRoundtrip:
-    """Task003 AC-1 test_run_row_roundtrip"""
-
+class TestRunRowRoundtrip:
     def test_insert_and_query_run_row(self, db_session: Session) -> None:
         run = _make_run()
         db_session.add(run)
@@ -78,9 +76,7 @@ class TestTask003AC1RunRowRoundtrip:
         assert fetched.current_projection_json is None
 
 
-class TestTask003AC2EventRowRoundtrip:
-    """Task003 AC-2 test_event_row_roundtrip"""
-
+class TestEventRowRoundtrip:
     def test_insert_and_query_event_row(self, db_session: Session) -> None:
         db_session.add(_make_run())
         db_session.flush()
@@ -99,9 +95,7 @@ class TestTask003AC2EventRowRoundtrip:
         assert fetched.idempotency_key is None
 
 
-class TestTask003AC3ReviewRowRoundtrip:
-    """Task003 AC-3 test_review_row_roundtrip"""
-
+class TestReviewRowRoundtrip:
     def test_insert_and_query_review_row(self, db_session: Session) -> None:
         db_session.add(_make_run())
         db_session.flush()
@@ -129,9 +123,7 @@ class TestTask003AC3ReviewRowRoundtrip:
 # ---------------------------------------------------------------------------
 
 
-class TestTask003EC1DuplicateEventSeqFails:
-    """Task003 EC-1 test_duplicate_event_seq_fails"""
-
+class TestDuplicateEventSeqFails:
     def test_duplicate_run_id_seq_raises_integrity_error(
         self, db_session: Session
     ) -> None:
@@ -151,9 +143,7 @@ class TestTask003EC1DuplicateEventSeqFails:
 # ---------------------------------------------------------------------------
 
 
-class TestTask003ERR1FkViolationRaises:
-    """Task003 ERR-1 test_fk_violation_raises"""
-
+class TestFkViolationRaises:
     def test_event_with_nonexistent_run_raises(self, db_session: Session) -> None:
         evt = _make_event(run_id="nonexistent-run")
         db_session.add(evt)

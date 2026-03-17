@@ -1,4 +1,4 @@
-"""Tests for reducer-projection wiring (Feature 008, Batch 02, Task 002)."""
+"""Tests for reducer-projection wiring."""
 
 import json
 
@@ -8,9 +8,7 @@ from pydantic import ValidationError
 from app.core.enums import RunStatus
 
 
-class TestTask002AC1RunProjectionImportableFromCore:
-    """Task002 AC-1 test_run_projection_importable_from_core"""
-
+class TestRunProjectionImportableFromCore:
     def test_run_projection_importable_from_core(self) -> None:
         from app.core import RunProjection
 
@@ -19,27 +17,21 @@ class TestTask002AC1RunProjectionImportableFromCore:
         assert proj.status == RunStatus.RECEIVED
 
 
-class TestTask002AC2ReduceEventsImportableFromCore:
-    """Task002 AC-2 test_reduce_events_importable_from_core"""
-
+class TestReduceEventsImportableFromCore:
     def test_reduce_events_importable_from_core(self) -> None:
         from app.core import reduce_events
 
         assert callable(reduce_events)
 
 
-class TestTask002AC3ReducerErrorImportableFromCore:
-    """Task002 AC-3 test_reducer_error_importable_from_core"""
-
+class TestReducerErrorImportableFromCore:
     def test_reducer_error_importable_from_core(self) -> None:
         from app.core import ReducerError
 
         assert issubclass(ReducerError, Exception)
 
 
-class TestTask002AC4ProjectionRoundTrip:
-    """Task002 AC-4 test_projection_round_trip"""
-
+class TestProjectionRoundTrip:
     def test_projection_round_trip(self) -> None:
         from app.core import RunProjection
 
@@ -64,9 +56,7 @@ class TestTask002AC4ProjectionRoundTrip:
         assert roundtripped == original
 
 
-class TestTask002EC1ProjectionDictJsonSerializable:
-    """Task002 EC-1 test_projection_dict_json_serializable"""
-
+class TestProjectionDictJsonSerializable:
     def test_projection_dict_json_serializable(self) -> None:
         from app.core import RunProjection
 
@@ -88,9 +78,7 @@ class TestTask002EC1ProjectionDictJsonSerializable:
         assert isinstance(serialized, str)
 
 
-class TestTask002ERR1InvalidStatusRaisesValidationError:
-    """Task002 ERR-1 test_invalid_status_raises_validation_error"""
-
+class TestInvalidStatusRaisesValidationError:
     def test_invalid_status_raises_validation_error(self) -> None:
         from app.core import RunProjection
 

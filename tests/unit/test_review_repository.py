@@ -1,4 +1,4 @@
-"""Unit tests for SQLiteReviewRepository + Module Wiring (Feature 005, Batch 02, Task 004)."""
+"""Unit tests for SQLiteReviewRepository + Module Wiring."""
 
 from datetime import datetime, timezone
 
@@ -66,9 +66,7 @@ def _make_review(run_id: str = "run-001", **overrides) -> ReviewTask:
 # ---------------------------------------------------------------------------
 
 
-class TestTask004AC1CreateAndRetrieveReview:
-    """Task004 AC-1 test_create_and_retrieve_review"""
-
+class TestCreateAndRetrieveReview:
     def test_create_persists_and_returns_review(self, repo, persisted_run) -> None:
         review = _make_review()
         result = repo.create(review)
@@ -81,9 +79,7 @@ class TestTask004AC1CreateAndRetrieveReview:
         assert fetched.decision is None
 
 
-class TestTask004AC2UpdateDecision:
-    """Task004 AC-2 test_update_decision"""
-
+class TestUpdateDecision:
     def test_update_decision_sets_fields(self, repo, persisted_run) -> None:
         review = _make_review()
         repo.create(review)
@@ -94,9 +90,7 @@ class TestTask004AC2UpdateDecision:
         assert updated.status == ReviewStatus.COMPLETED
 
 
-class TestTask004AC3GetByRun:
-    """Task004 AC-3 test_get_by_run"""
-
+class TestGetByRun:
     def test_get_by_run_returns_matching_review(self, repo, persisted_run) -> None:
         review = _make_review()
         repo.create(review)
@@ -105,9 +99,7 @@ class TestTask004AC3GetByRun:
         assert fetched.run_id == "run-001"
 
 
-class TestTask004AC4ModuleReExports:
-    """Task004 AC-4 test_module_re_exports"""
-
+class TestModuleReExports:
     def test_all_symbols_importable_from_repositories(self) -> None:
         from app.db.repositories import (
             AbstractEventRepository,
@@ -133,17 +125,13 @@ class TestTask004AC4ModuleReExports:
 # ---------------------------------------------------------------------------
 
 
-class TestTask004EC1GetByRunNone:
-    """Task004 EC-1 test_get_by_run_none"""
-
+class TestGetByRunNone:
     def test_get_by_run_no_review_returns_none(self, repo) -> None:
         result = repo.get_by_run("run-with-no-review")
         assert result is None
 
 
-class TestTask004EC2FkEnforcement:
-    """Task004 EC-2 test_fk_enforcement"""
-
+class TestFkEnforcement:
     def test_create_review_with_nonexistent_run_raises(self, repo) -> None:
         review = _make_review(run_id="nonexistent-run")
         with pytest.raises(IntegrityError):
@@ -155,9 +143,7 @@ class TestTask004EC2FkEnforcement:
 # ---------------------------------------------------------------------------
 
 
-class TestTask004ERR1UpdateNonexistentRaises:
-    """Task004 ERR-1 test_update_nonexistent_raises"""
-
+class TestUpdateNonexistentRaises:
     def test_update_decision_nonexistent_raises_valueerror(self, repo) -> None:
         now = datetime(2026, 6, 15, tzinfo=timezone.utc)
         with pytest.raises(ValueError, match="not found"):

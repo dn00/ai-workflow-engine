@@ -1,7 +1,4 @@
-"""Tests for documentation structure verification (Feature 018, Batch 01).
-
-Task 001: Demo script + architecture docs — AC-1..4, EC-1..2, ERR-1
-Task 002: README — AC-1..4, EC-1..2, ERR-1
+"""Tests for documentation structure verification.
 """
 
 import re
@@ -14,12 +11,11 @@ DOCS = ROOT / "docs"
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-1 `test_demo_script_has_four_sections`
+# `test_demo_script_has_four_sections`
 # ---------------------------------------------------------------------------
 
 
 def test_demo_script_has_four_sections():
-    """Task001 AC-1 test_demo_script_has_four_sections — exactly 4 demo sections."""
     path = DOCS / "demo-script.md"
     assert path.exists(), f"Required documentation file not found: {path}"
     content = path.read_text()
@@ -28,12 +24,11 @@ def test_demo_script_has_four_sections():
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-2 `test_demo_sections_have_content`
+# `test_demo_sections_have_content`
 # ---------------------------------------------------------------------------
 
 
 def test_demo_sections_have_content():
-    """Task001 AC-2 test_demo_sections_have_content — each demo has input + expected outcome."""
     path = DOCS / "demo-script.md"
     assert path.exists(), f"Required documentation file not found: {path}"
     content = path.read_text()
@@ -67,12 +62,11 @@ def test_demo_sections_have_content():
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-3 `test_architecture_has_layers`
+# `test_architecture_has_layers`
 # ---------------------------------------------------------------------------
 
 
 def test_architecture_has_layers():
-    """Task001 AC-3 test_architecture_has_layers — contains all 4 layer descriptions."""
     path = DOCS / "architecture.md"
     assert path.exists(), f"Required documentation file not found: {path}"
     content = path.read_text().lower()
@@ -83,12 +77,11 @@ def test_architecture_has_layers():
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-4 `test_architecture_has_extension_seams`
+# `test_architecture_has_extension_seams`
 # ---------------------------------------------------------------------------
 
 
 def test_architecture_has_extension_seams():
-    """Task001 AC-4 test_architecture_has_extension_seams — data flow + extension seams."""
     path = DOCS / "architecture.md"
     assert path.exists(), f"Required documentation file not found: {path}"
     content = path.read_text().lower()
@@ -100,12 +93,11 @@ def test_architecture_has_extension_seams():
 
 
 # ---------------------------------------------------------------------------
-# Task001 EC-1 `test_demo_script_valid_endpoints`
+# `test_demo_script_valid_endpoints`
 # ---------------------------------------------------------------------------
 
 
 def test_demo_script_valid_endpoints():
-    """Task001 EC-1 test_demo_script_valid_endpoints — all API/UI paths match real routes."""
     path = DOCS / "demo-script.md"
     assert path.exists(), f"Required documentation file not found: {path}"
     content = path.read_text()
@@ -142,12 +134,11 @@ def test_demo_script_valid_endpoints():
 
 
 # ---------------------------------------------------------------------------
-# Task001 EC-2 `test_architecture_dir_structure`
+# `test_architecture_dir_structure`
 # ---------------------------------------------------------------------------
 
 
 def test_architecture_dir_structure():
-    """Task001 EC-2 test_architecture_dir_structure — listed directories exist."""
     path = DOCS / "architecture.md"
     assert path.exists(), f"Required documentation file not found: {path}"
     content = path.read_text()
@@ -166,12 +157,11 @@ def test_architecture_dir_structure():
 
 
 # ---------------------------------------------------------------------------
-# Task001 ERR-1 `test_missing_doc_file_fails`
+# `test_missing_doc_file_fails`
 # ---------------------------------------------------------------------------
 
 
 def test_missing_doc_file_fails():
-    """Task001 ERR-1 test_missing_doc_file_fails — missing doc file produces descriptive error."""
     nonexistent = DOCS / "nonexistent-doc.md"
     assert not nonexistent.exists(), "Test setup: file should not exist"
 
@@ -181,12 +171,11 @@ def test_missing_doc_file_fails():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-1 `test_readme_has_summary`
+# `test_readme_has_summary`
 # ---------------------------------------------------------------------------
 
 
 def test_readme_has_summary():
-    """Task002 AC-1 test_readme_has_summary — title + deterministic AI workflow summary."""
     path = ROOT / "README.md"
     assert path.exists(), "Required file not found: README.md"
     content = path.read_text()
@@ -197,12 +186,11 @@ def test_readme_has_summary():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-2 `test_readme_has_setup`
+# `test_readme_has_setup`
 # ---------------------------------------------------------------------------
 
 
 def test_readme_has_setup():
-    """Task002 AC-2 test_readme_has_setup — contains pip install and Python version."""
     path = ROOT / "README.md"
     assert path.exists(), "Required file not found: README.md"
     content = path.read_text()
@@ -216,12 +204,11 @@ def test_readme_has_setup():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-3 `test_readme_has_demo`
+# `test_readme_has_demo`
 # ---------------------------------------------------------------------------
 
 
 def test_readme_has_demo():
-    """Task002 AC-3 test_readme_has_demo — contains make demo and link to demo-script."""
     path = ROOT / "README.md"
     assert path.exists(), "Required file not found: README.md"
     content = path.read_text()
@@ -231,12 +218,11 @@ def test_readme_has_demo():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-4 `test_readme_has_arch_and_testing`
+# `test_readme_has_arch_and_testing`
 # ---------------------------------------------------------------------------
 
 
 def test_readme_has_arch_and_testing():
-    """Task002 AC-4 test_readme_has_arch_and_testing — architecture + testing sections."""
     path = ROOT / "README.md"
     assert path.exists(), "Required file not found: README.md"
     content = path.read_text().lower()
@@ -247,12 +233,11 @@ def test_readme_has_arch_and_testing():
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-1 `test_readme_make_targets_exist`
+# `test_readme_make_targets_exist`
 # ---------------------------------------------------------------------------
 
 
 def test_readme_make_targets_exist():
-    """Task002 EC-1 test_readme_make_targets_exist — referenced make targets are real."""
     readme_path = ROOT / "README.md"
     makefile_path = ROOT / "Makefile"
     assert readme_path.exists(), "Required file not found: README.md"
@@ -282,12 +267,11 @@ def test_readme_make_targets_exist():
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-2 `test_readme_links_valid`
+# `test_readme_links_valid`
 # ---------------------------------------------------------------------------
 
 
 def test_readme_links_valid():
-    """Task002 EC-2 test_readme_links_valid — linked doc files exist."""
     readme_path = ROOT / "README.md"
     assert readme_path.exists(), "Required file not found: README.md"
     content = readme_path.read_text()
@@ -302,12 +286,11 @@ def test_readme_links_valid():
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-1 `test_missing_readme_fails`
+# `test_missing_readme_fails`
 # ---------------------------------------------------------------------------
 
 
 def test_missing_readme_fails():
-    """Task002 ERR-1 test_missing_readme_fails — missing README produces descriptive error."""
     nonexistent = ROOT / "NONEXISTENT_README.md"
     assert not nonexistent.exists(), "Test setup: file should not exist"
 

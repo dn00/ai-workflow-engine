@@ -1,4 +1,4 @@
-"""Unit tests for SQLAlchemy ORM table models (Feature 004, Batch 01)."""
+"""Unit tests for SQLAlchemy ORM table models."""
 
 from datetime import datetime, timezone
 
@@ -14,9 +14,7 @@ from app.db.models import Base, EventRow, ReviewRow, RunRow
 # ---------------------------------------------------------------------------
 
 
-class TestTask001AC1RunRowColumns:
-    """Task001 AC-1 test_run_row_columns"""
-
+class TestRunRowColumns:
     def test_run_row_has_seven_columns(self) -> None:
         table = RunRow.__table__
         assert len(table.columns) == 7
@@ -43,9 +41,7 @@ class TestTask001AC1RunRowColumns:
         assert cols["run_id"].primary_key is True
 
 
-class TestTask001AC2EventRowColumns:
-    """Task001 AC-2 test_event_row_columns"""
-
+class TestEventRowColumns:
     def test_event_row_has_nine_columns(self) -> None:
         table = EventRow.__table__
         assert len(table.columns) == 9
@@ -74,9 +70,7 @@ class TestTask001AC2EventRowColumns:
         assert cols["event_id"].primary_key is True
 
 
-class TestTask001AC3ReviewRowColumns:
-    """Task001 AC-3 test_review_row_columns"""
-
+class TestReviewRowColumns:
     def test_review_row_has_five_columns(self) -> None:
         table = ReviewRow.__table__
         assert len(table.columns) == 5
@@ -101,9 +95,7 @@ class TestTask001AC3ReviewRowColumns:
         assert cols["review_id"].primary_key is True
 
 
-class TestTask001AC4ForeignKeyConstraints:
-    """Task001 AC-4 test_foreign_key_constraints"""
-
+class TestForeignKeyConstraints:
     def test_event_row_fk_references_runs(self) -> None:
         cols = {c.name: c for c in EventRow.__table__.columns}
         fks = list(cols["run_id"].foreign_keys)
@@ -122,9 +114,7 @@ class TestTask001AC4ForeignKeyConstraints:
 # ---------------------------------------------------------------------------
 
 
-class TestTask001EC1EventUniqueConstraint:
-    """Task001 EC-1 test_event_unique_constraint"""
-
+class TestEventUniqueConstraint:
     def test_unique_constraint_on_run_id_seq(self) -> None:
         constraints = EventRow.__table__.constraints
         unique_constraints = [
@@ -139,9 +129,7 @@ class TestTask001EC1EventUniqueConstraint:
         assert uc.name == "uq_event_run_seq"
 
 
-class TestTask001EC2NullableColumns:
-    """Task001 EC-2 test_nullable_columns"""
-
+class TestNullableColumns:
     def test_non_nullable_columns(self) -> None:
         """PKs and required fields must NOT be nullable."""
         non_nullable = {
@@ -194,9 +182,7 @@ class TestTask001EC2NullableColumns:
 # ---------------------------------------------------------------------------
 
 
-class TestTask001ERR1DuplicatePkRaises:
-    """Task001 ERR-1 test_duplicate_pk_raises"""
-
+class TestDuplicatePkRaises:
     @pytest.fixture()
     def db_session(self) -> Session:
         engine = create_engine("sqlite:///:memory:")

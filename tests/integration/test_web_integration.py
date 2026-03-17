@@ -1,6 +1,4 @@
 """End-to-end integration tests for web UI flows.
-
-Feature 016, Batch 03, Task 004.
 Tests all 4 spec §31 demo paths through the browser UI.
 """
 
@@ -60,12 +58,11 @@ def client():
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-1: Happy path (auto-approve) through UI
+# Happy path (auto-approve) through UI
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_AC_1_test_happy_path_through_ui(client: TestClient):
-    """Task004 AC-1 test_happy_path_through_ui"""
+def test_happy_path_through_ui(client: TestClient):
     # 1. Submit intake
     resp = client.post(
         "/ui/intake",
@@ -87,12 +84,11 @@ def test_Task004_AC_1_test_happy_path_through_ui(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-2: Review path through UI
+# Review path through UI
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_AC_2_test_review_path_through_ui(client: TestClient):
-    """Task004 AC-2 test_review_path_through_ui"""
+def test_review_path_through_ui(client: TestClient):
     # 1. Submit intake with review-triggering input
     resp = client.post(
         "/ui/intake",
@@ -127,12 +123,11 @@ def test_Task004_AC_2_test_review_path_through_ui(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-3: Rejection path through UI
+# Rejection path through UI
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_AC_3_test_rejection_path_through_ui(client: TestClient):
-    """Task004 AC-3 test_rejection_path_through_ui"""
+def test_rejection_path_through_ui(client: TestClient):
     # 1. Submit intake with forbidden system
     resp = client.post(
         "/ui/intake",
@@ -153,12 +148,11 @@ def test_Task004_AC_3_test_rejection_path_through_ui(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task004 AC-4: Replay path through UI
+# Replay path through UI
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_AC_4_test_replay_path_through_ui(client: TestClient):
-    """Task004 AC-4 test_replay_path_through_ui"""
+def test_replay_path_through_ui(client: TestClient):
     # 1. Create a completed run
     resp = client.post(
         "/ui/intake",
@@ -179,12 +173,11 @@ def test_Task004_AC_4_test_replay_path_through_ui(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task004 EC-1: DRY_RUN through full UI
+# DRY_RUN through full UI
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_EC_1_test_dry_run_through_ui(client: TestClient):
-    """Task004 EC-1 test_dry_run_through_ui"""
+def test_dry_run_through_ui(client: TestClient):
     # 1. Submit intake in dry_run mode
     resp = client.post(
         "/ui/intake",
@@ -206,12 +199,11 @@ def test_Task004_EC_1_test_dry_run_through_ui(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task004 ERR-1: Error recovery during flow
+# Error recovery during flow
 # ---------------------------------------------------------------------------
 
 
-def test_Task004_ERR_1_test_error_recovery_ui(client: TestClient):
-    """Task004 ERR-1 test_error_recovery_ui"""
+def test_error_recovery_ui(client: TestClient):
     # Create a review-required run
     resp = client.post(
         "/ui/intake",

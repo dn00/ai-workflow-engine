@@ -1,4 +1,4 @@
-"""Route-level tests for GET /runs/{run_id}/bundle (Feature 015, Batch 02, Task 002)."""
+"""Route-level tests for GET /runs/{run_id}/bundle."""
 
 from unittest.mock import MagicMock, patch
 
@@ -9,13 +9,11 @@ from app.core.bundle.models import BundleError
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-1: test_get_bundle_returns_200
+# test_get_bundle_returns_200
 # ---------------------------------------------------------------------------
 
 
 class TestGetBundleReturns200:
-    """Task002 AC-1 test_get_bundle_returns_200"""
-
     def test_get_bundle_returns_200(self):
         from datetime import datetime, timezone
 
@@ -70,13 +68,11 @@ class TestGetBundleReturns200:
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-1: test_get_bundle_unknown_run_404
+# test_get_bundle_unknown_run_404
 # ---------------------------------------------------------------------------
 
 
 class TestGetBundleUnknownRun404:
-    """Task002 ERR-1 test_get_bundle_unknown_run_404"""
-
     def test_get_bundle_unknown_run_404(self):
         with patch(
             "app.api.routes.runs.assemble_bundle",
@@ -93,13 +89,11 @@ class TestGetBundleUnknownRun404:
 
 
 # ---------------------------------------------------------------------------
-# Task002 ERR-2: test_get_bundle_assembly_error_400
+# test_get_bundle_assembly_error_400
 # ---------------------------------------------------------------------------
 
 
 class TestGetBundleAssemblyError400:
-    """Task002 ERR-2 test_get_bundle_assembly_error_400"""
-
     def test_get_bundle_assembly_error_400(self):
         with patch(
             "app.api.routes.runs.assemble_bundle",

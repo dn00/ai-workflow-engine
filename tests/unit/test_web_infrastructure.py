@@ -1,6 +1,4 @@
 """Tests for web UI infrastructure + intake screen.
-
-Feature 016, Batch 01, Task 001.
 """
 
 import pytest
@@ -21,12 +19,11 @@ def client():
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-1: input_text in run.received payload
+# input_text in run.received payload
 # ---------------------------------------------------------------------------
 
 
-def test_Task001_AC_1_test_run_received_contains_input_text(client: TestClient):
-    """Task001 AC-1 test_run_received_contains_input_text"""
+def test_run_received_contains_input_text(client: TestClient):
     # Create a run via the API
     resp = client.post("/runs", json={"input_text": "Hello IT", "mode": "live"})
     assert resp.status_code == 201
@@ -44,12 +41,11 @@ def test_Task001_AC_1_test_run_received_contains_input_text(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-2: Repos on app.state
+# Repos on app.state
 # ---------------------------------------------------------------------------
 
 
-def test_Task001_AC_2_test_app_state_exposes_receipt_and_review_repos(client: TestClient):
-    """Task001 AC-2 test_app_state_exposes_receipt_and_review_repos"""
+def test_app_state_exposes_receipt_and_review_repos(client: TestClient):
     app = client.app
     assert hasattr(app.state, "receipt_repo")
     assert hasattr(app.state, "review_repo")
@@ -58,12 +54,11 @@ def test_Task001_AC_2_test_app_state_exposes_receipt_and_review_repos(client: Te
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-3: Base template renders
+# Base template renders
 # ---------------------------------------------------------------------------
 
 
-def test_Task001_AC_3_test_base_template_renders(client: TestClient):
-    """Task001 AC-3 test_base_template_renders"""
+def test_base_template_renders(client: TestClient):
     resp = client.get("/ui/intake")
     assert resp.status_code == 200
     assert "text/html" in resp.headers["content-type"]
@@ -74,12 +69,11 @@ def test_Task001_AC_3_test_base_template_renders(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-4: Intake form renders
+# Intake form renders
 # ---------------------------------------------------------------------------
 
 
-def test_Task001_AC_4_test_intake_form_renders(client: TestClient):
-    """Task001 AC-4 test_intake_form_renders"""
+def test_intake_form_renders(client: TestClient):
     resp = client.get("/ui/intake")
     assert resp.status_code == 200
     html = resp.text
@@ -91,12 +85,11 @@ def test_Task001_AC_4_test_intake_form_renders(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task001 AC-5: Intake submission redirects to run detail
+# Intake submission redirects to run detail
 # ---------------------------------------------------------------------------
 
 
-def test_Task001_AC_5_test_intake_submission_redirects_to_run_detail(client: TestClient):
-    """Task001 AC-5 test_intake_submission_redirects_to_run_detail"""
+def test_intake_submission_redirects_to_run_detail(client: TestClient):
     resp = client.post(
         "/ui/intake",
         data={"input_text": "test input", "mode": "live"},
@@ -108,12 +101,11 @@ def test_Task001_AC_5_test_intake_submission_redirects_to_run_detail(client: Tes
 
 
 # ---------------------------------------------------------------------------
-# Task001 EC-1: DRY_RUN mode via intake
+# DRY_RUN mode via intake
 # ---------------------------------------------------------------------------
 
 
-def test_Task001_EC_1_test_intake_dry_run_mode(client: TestClient):
-    """Task001 EC-1 test_intake_dry_run_mode"""
+def test_intake_dry_run_mode(client: TestClient):
     resp = client.post(
         "/ui/intake",
         data={"input_text": "test input", "mode": "dry_run"},
@@ -131,12 +123,11 @@ def test_Task001_EC_1_test_intake_dry_run_mode(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task001 EC-2: Empty input text submission
+# Empty input text submission
 # ---------------------------------------------------------------------------
 
 
-def test_Task001_EC_2_test_intake_empty_input(client: TestClient):
-    """Task001 EC-2 test_intake_empty_input"""
+def test_intake_empty_input(client: TestClient):
     resp = client.post(
         "/ui/intake",
         data={"input_text": "", "mode": "live"},
@@ -149,12 +140,11 @@ def test_Task001_EC_2_test_intake_empty_input(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task001 ERR-1: Runner error during start_run
+# Runner error during start_run
 # ---------------------------------------------------------------------------
 
 
-def test_Task001_ERR_1_test_intake_runner_error(client: TestClient):
-    """Task001 ERR-1 test_intake_runner_error"""
+def test_intake_runner_error(client: TestClient):
     with patch.object(
         client.app.state.runner, "start_run", side_effect=RunnerError("Workflow not registered")
     ):
@@ -169,12 +159,11 @@ def test_Task001_ERR_1_test_intake_runner_error(client: TestClient):
 
 
 # ---------------------------------------------------------------------------
-# Task001 ERR-2: Unexpected server error
+# Unexpected server error
 # ---------------------------------------------------------------------------
 
 
-def test_Task001_ERR_2_test_intake_server_error(client: TestClient):
-    """Task001 ERR-2 test_intake_server_error"""
+def test_intake_server_error(client: TestClient):
     with patch.object(
         client.app.state.runner, "start_run", side_effect=RuntimeError("kaboom")
     ):

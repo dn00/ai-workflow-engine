@@ -1,6 +1,4 @@
 """Integration tests for GET /runs/{run_id}/bundle — end-to-end bundle export.
-
-Feature 015, Batch 02, Task 002.
 Tests use TestClient + create_app with in-memory SQLite and configured MockLLMAdapter.
 """
 
@@ -64,13 +62,11 @@ def client():
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-2: test_bundle_approved_run_end_to_end
+# test_bundle_approved_run_end_to_end
 # ---------------------------------------------------------------------------
 
 
 class TestBundleApprovedRunEndToEnd:
-    """Task002 AC-2 test_bundle_approved_run_end_to_end"""
-
     def test_bundle_approved_run_end_to_end(self, client: TestClient):
         # Create a happy-path auto-approved run
         create_resp = client.post(
@@ -109,13 +105,11 @@ class TestBundleApprovedRunEndToEnd:
 
 
 # ---------------------------------------------------------------------------
-# Task002 AC-3: test_bundle_rejected_run_end_to_end
+# test_bundle_rejected_run_end_to_end
 # ---------------------------------------------------------------------------
 
 
 class TestBundleRejectedRunEndToEnd:
-    """Task002 AC-3 test_bundle_rejected_run_end_to_end"""
-
     def test_bundle_rejected_run_end_to_end(self, client: TestClient):
         # Create a rejection-path run (forbidden system → validation failure)
         create_resp = client.post(
@@ -142,13 +136,11 @@ class TestBundleRejectedRunEndToEnd:
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-1: test_bundle_proposal_invalid_run
+# test_bundle_proposal_invalid_run
 # ---------------------------------------------------------------------------
 
 
 class TestBundleProposalInvalidRun:
-    """Task002 EC-1 test_bundle_proposal_invalid_run"""
-
     def test_bundle_proposal_invalid_run(self, client: TestClient):
         # Create a parse failure run
         create_resp = client.post(
@@ -175,13 +167,11 @@ class TestBundleProposalInvalidRun:
 
 
 # ---------------------------------------------------------------------------
-# Task002 EC-2: test_bundle_in_progress_run
+# test_bundle_in_progress_run
 # ---------------------------------------------------------------------------
 
 
 class TestBundleInProgressRun:
-    """Task002 EC-2 test_bundle_in_progress_run"""
-
     def test_bundle_in_progress_run(self, client: TestClient):
         # Create a review-required run (paused state)
         create_resp = client.post(

@@ -22,9 +22,7 @@ def _make_mock_workflow():
 
 
 class TestCliAdapterSubprocessArgs:
-    # Task002 AC-1 `test_cli_adapter_subprocess_args`
-    """Task002 AC-1 test_cli_adapter_subprocess_args"""
-
+    # `test_cli_adapter_subprocess_args`
     @patch("app.llm.cli_adapter.get_workflow")
     @patch("app.llm.cli_adapter.subprocess.run")
     def test_cli_adapter_subprocess_args(self, mock_run, mock_get_wf, tmp_path):
@@ -56,9 +54,7 @@ class TestCliAdapterSubprocessArgs:
 
 
 class TestCliAdapterReadsResponse:
-    # Task002 AC-2 `test_cli_adapter_reads_response`
-    """Task002 AC-2 test_cli_adapter_reads_response"""
-
+    # `test_cli_adapter_reads_response`
     @patch("app.llm.cli_adapter.get_workflow")
     @patch("app.llm.cli_adapter.subprocess.run")
     def test_cli_adapter_reads_response(self, mock_run, mock_get_wf, tmp_path):
@@ -89,9 +85,7 @@ class TestCliAdapterReadsResponse:
 
 
 class TestCliAdapterResolvesPrompt:
-    # Task002 AC-3 `test_cli_adapter_resolves_prompt`
-    """Task002 AC-3 test_cli_adapter_resolves_prompt"""
-
+    # `test_cli_adapter_resolves_prompt`
     @patch("app.llm.cli_adapter.get_workflow")
     @patch("app.llm.cli_adapter.subprocess.run")
     def test_cli_adapter_resolves_prompt(self, mock_run, mock_get_wf):
@@ -122,9 +116,7 @@ class TestCliAdapterResolvesPrompt:
 
 
 class TestCliAdapterNonJsonResponse:
-    # Task002 EC-1 `test_cli_adapter_non_json_response`
-    """Task002 EC-1 test_cli_adapter_non_json_response"""
-
+    # `test_cli_adapter_non_json_response`
     @patch("app.llm.cli_adapter.get_workflow")
     @patch("app.llm.cli_adapter.subprocess.run")
     def test_cli_adapter_non_json_response(self, mock_run, mock_get_wf):
@@ -145,9 +137,7 @@ class TestCliAdapterNonJsonResponse:
 
 
 class TestCallClaudeErrorOnFailure:
-    # Task002 EC-2 `test_call_claude_error_on_failure`
-    """Task002 EC-2 test_call_claude_error_on_failure"""
-
+    # `test_call_claude_error_on_failure`
     @patch("app.llm.cli_adapter.get_workflow")
     @patch("app.llm.cli_adapter.subprocess.run")
     def test_call_claude_error_on_failure(self, mock_run, mock_get_wf):
@@ -169,9 +159,7 @@ class TestCallClaudeErrorOnFailure:
 
 
 class TestCliAdapterTimeout:
-    # Task002 ERR-1 `test_cli_adapter_timeout`
-    """Task002 ERR-1 test_cli_adapter_timeout"""
-
+    # `test_cli_adapter_timeout`
     @patch("app.llm.cli_adapter.get_workflow")
     @patch("app.llm.cli_adapter.subprocess.run")
     def test_cli_adapter_timeout(self, mock_run, mock_get_wf):
@@ -186,9 +174,7 @@ class TestCliAdapterTimeout:
 
 
 class TestCliAdapterClaudeNotFound:
-    # Task002 ERR-2 `test_cli_adapter_claude_not_found`
-    """Task002 ERR-2 test_cli_adapter_claude_not_found"""
-
+    # `test_cli_adapter_claude_not_found`
     @patch("app.llm.cli_adapter.get_workflow")
     @patch("app.llm.cli_adapter.subprocess.run")
     def test_cli_adapter_claude_not_found(self, mock_run, mock_get_wf):
@@ -203,9 +189,7 @@ class TestCliAdapterClaudeNotFound:
 
 
 class TestCliAdapterSubprocessFailure:
-    # Task002 ERR-3 `test_cli_adapter_subprocess_failure`
-    """Task002 ERR-3 test_cli_adapter_subprocess_failure"""
-
+    # `test_cli_adapter_subprocess_failure`
     @patch("app.llm.cli_adapter.get_workflow")
     @patch("app.llm.cli_adapter.subprocess.run")
     def test_cli_adapter_subprocess_failure(self, mock_run, mock_get_wf):

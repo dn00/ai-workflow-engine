@@ -1,4 +1,4 @@
-"""Tests for schema validator (Feature 006, Task 005)."""
+"""Tests for schema validator."""
 
 from app.core.enums import ReasonCode
 from app.workflows.access_request.normalize import normalize_proposal
@@ -30,9 +30,7 @@ def _make_valid_normalized() -> NormalizedFields:
     )
 
 
-class TestTask005AC1ValidProposalPasses:
-    """Task005 AC-1 test_valid_proposal_passes"""
-
+class TestValidProposalPasses:
     def test_full_valid_proposal(self) -> None:
         proposal = _make_valid_proposal()
         normalized = _make_valid_normalized()
@@ -41,9 +39,7 @@ class TestTask005AC1ValidProposalPasses:
         assert result.errors == []
 
 
-class TestTask005AC2UnsupportedRequestType:
-    """Task005 AC-2 test_unsupported_request_type"""
-
+class TestUnsupportedRequestType:
     def test_invoice_request_type(self) -> None:
         proposal = _make_valid_proposal()
         proposal.request_type = "invoice"
@@ -53,9 +49,7 @@ class TestTask005AC2UnsupportedRequestType:
         assert ReasonCode.UNSUPPORTED_REQUEST_TYPE in result.errors
 
 
-class TestTask005AC3MissingEmployeeName:
-    """Task005 AC-3 test_missing_employee_name"""
-
+class TestMissingEmployeeName:
     def test_empty_employee_name(self) -> None:
         proposal = _make_valid_proposal()
         proposal.employee_name = None
@@ -65,9 +59,7 @@ class TestTask005AC3MissingEmployeeName:
         assert len(result.errors) >= 1
 
 
-class TestTask005AC4NoSystemsRequested:
-    """Task005 AC-4 test_no_systems_requested"""
-
+class TestNoSystemsRequested:
     def test_no_systems(self) -> None:
         proposal = _make_valid_proposal()
         proposal.systems_requested = None
@@ -77,9 +69,7 @@ class TestTask005AC4NoSystemsRequested:
         assert len(result.errors) >= 1
 
 
-class TestTask005AC5UnknownSystem:
-    """Task005 AC-5 test_unknown_system"""
-
+class TestUnknownSystem:
     def test_unknown_app(self) -> None:
         proposal = _make_valid_proposal()
         proposal.systems_requested = ["unknown_app"]
@@ -93,9 +83,7 @@ class TestTask005AC5UnknownSystem:
         assert AccessRequestReasonCode.UNKNOWN_SYSTEM in result.errors
 
 
-class TestTask005EC1ForbiddenSystem:
-    """Task005 EC-1 test_forbidden_system"""
-
+class TestForbiddenSystem:
     def test_admin_console(self) -> None:
         proposal = _make_valid_proposal()
         proposal.systems_requested = ["admin_console"]
@@ -109,9 +97,7 @@ class TestTask005EC1ForbiddenSystem:
         assert AccessRequestReasonCode.FORBIDDEN_SYSTEM in result.errors
 
 
-class TestTask005EC2MalformedDate:
-    """Task005 EC-2 test_malformed_date"""
-
+class TestMalformedDate:
     def test_invalid_date_string(self) -> None:
         proposal = _make_valid_proposal()
         proposal.start_date = "not-a-date"
@@ -121,9 +107,7 @@ class TestTask005EC2MalformedDate:
         assert ReasonCode.MALFORMED_DATE in result.errors
 
 
-class TestTask005EC3ValidDatePasses:
-    """Task005 EC-3 test_valid_date_passes"""
-
+class TestValidDatePasses:
     def test_iso_date(self) -> None:
         proposal = _make_valid_proposal()
         proposal.start_date = "2026-03-12"
@@ -132,9 +116,7 @@ class TestTask005EC3ValidDatePasses:
         assert ReasonCode.MALFORMED_DATE not in result.errors
 
 
-class TestTask005EC4NoDateIsOk:
-    """Task005 EC-4 test_no_date_is_ok"""
-
+class TestNoDateIsOk:
     def test_none_date(self) -> None:
         proposal = _make_valid_proposal()
         proposal.start_date = None
@@ -143,9 +125,7 @@ class TestTask005EC4NoDateIsOk:
         assert ReasonCode.MALFORMED_DATE not in result.errors
 
 
-class TestTask005EC5MixedKnownAndForbidden:
-    """Task005 EC-5 test_mixed_known_and_forbidden"""
-
+class TestMixedKnownAndForbidden:
     def test_salesforce_and_admin_console(self) -> None:
         proposal = _make_valid_proposal()
         proposal.systems_requested = ["salesforce", "admin_console"]
@@ -159,9 +139,7 @@ class TestTask005EC5MixedKnownAndForbidden:
         assert AccessRequestReasonCode.FORBIDDEN_SYSTEM in result.errors
 
 
-class TestTask005ERR1MultipleErrorsAccumulated:
-    """Task005 ERR-1 test_multiple_errors_accumulated"""
-
+class TestMultipleErrorsAccumulated:
     def test_bad_type_and_missing_name(self) -> None:
         proposal = Proposal(
             request_type="invoice",
@@ -175,9 +153,7 @@ class TestTask005ERR1MultipleErrorsAccumulated:
         assert ReasonCode.UNSUPPORTED_REQUEST_TYPE in result.errors
 
 
-class TestTask005ERR2CompletelyEmptyProposal:
-    """Task005 ERR-2 test_completely_empty_proposal"""
-
+class TestCompletelyEmptyProposal:
     def test_all_none(self) -> None:
         proposal = Proposal()
         normalized = normalize_proposal(proposal)
@@ -186,9 +162,7 @@ class TestTask005ERR2CompletelyEmptyProposal:
         assert len(result.errors) >= 3
 
 
-class TestTask005ERR3NoneRequestTypeUnsupported:
-    """Task005 ERR-3 test_none_request_type_unsupported"""
-
+class TestNoneRequestTypeUnsupported:
     def test_none_request_type(self) -> None:
         proposal = _make_valid_proposal()
         proposal.request_type = None

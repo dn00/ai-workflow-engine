@@ -24,7 +24,7 @@ demo:
 	@echo "  API docs: http://127.0.0.1:8000/docs"
 	@echo "  Press Ctrl+C to stop"
 	@echo ""
-	uvicorn app.main:app --host 127.0.0.1 --port 8000
+	LLM_ADAPTER=cli uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 export-bundle:
 	python scripts/export_bundle.py $(RUN_ID)

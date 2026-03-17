@@ -21,9 +21,7 @@ FROZEN_FIELDS = [
 
 
 class TestSystemPromptContainsAllFields:
-    # Task003 AC-1 `test_system_prompt_contains_all_fields`
-    """Task003 AC-1 test_system_prompt_contains_all_fields"""
-
+    # `test_system_prompt_contains_all_fields`
     def test_system_prompt_contains_all_fields(self):
         """AC-1: System prompt mentions all 9 frozen proposal fields."""
         for field in FROZEN_FIELDS:
@@ -31,9 +29,7 @@ class TestSystemPromptContainsAllFields:
 
 
 class TestBuildUserPromptEmbedsInput:
-    # Task003 AC-2 `test_build_user_prompt_embeds_input`
-    """Task003 AC-2 test_build_user_prompt_embeds_input"""
-
+    # `test_build_user_prompt_embeds_input`
     def test_build_user_prompt_embeds_input(self):
         """AC-2: build_user_prompt embeds the input text."""
         result = build_user_prompt("Please give John access to Salesforce")
@@ -41,18 +37,14 @@ class TestBuildUserPromptEmbedsInput:
 
 
 class TestPromptVersionConstant:
-    # Task003 AC-3 `test_prompt_version_constant`
-    """Task003 AC-3 test_prompt_version_constant"""
-
+    # `test_prompt_version_constant`
     def test_prompt_version_constant(self):
         """AC-3: PROMPT_VERSION is '1.0'."""
         assert PROMPT_VERSION == "1.0"
 
 
 class TestBuildUserPromptEmptyInput:
-    # Task003 EC-1 `test_build_user_prompt_empty_input`
-    """Task003 EC-1 test_build_user_prompt_empty_input"""
-
+    # `test_build_user_prompt_empty_input`
     def test_build_user_prompt_empty_input(self):
         """EC-1: build_user_prompt with empty input returns valid prompt string."""
         result = build_user_prompt("")
@@ -61,9 +53,7 @@ class TestBuildUserPromptEmptyInput:
 
 
 class TestWorkflowBarrelExportsPrompt:
-    # Task003 ERR-1 `test_workflow_barrel_exports_prompt`
-    """Task003 ERR-1 test_workflow_barrel_exports_prompt"""
-
+    # `test_workflow_barrel_exports_prompt`
     def test_workflow_barrel_exports_prompt(self):
         """ERR-1: Workflow barrel exports prompt symbols."""
         from app.workflows.access_request import (

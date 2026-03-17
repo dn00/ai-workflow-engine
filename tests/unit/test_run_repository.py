@@ -1,4 +1,4 @@
-"""Unit tests for SQLiteRunRepository (Feature 005, Batch 02, Task 002)."""
+"""Unit tests for SQLiteRunRepository."""
 
 from datetime import datetime, timezone
 
@@ -48,9 +48,7 @@ def _make_run(**overrides) -> Run:
 # ---------------------------------------------------------------------------
 
 
-class TestTask002AC1CreateAndRetrieveRun:
-    """Task002 AC-1 test_create_and_retrieve_run"""
-
+class TestCreateAndRetrieveRun:
     def test_create_persists_and_returns_run(self, repo) -> None:
         run = _make_run()
         result = repo.create(run)
@@ -61,9 +59,7 @@ class TestTask002AC1CreateAndRetrieveRun:
         assert fetched.run_id == run.run_id
 
 
-class TestTask002AC2GetRunById:
-    """Task002 AC-2 test_get_run_by_id"""
-
+class TestGetRunById:
     def test_get_returns_matching_run(self, repo) -> None:
         run = _make_run()
         repo.create(run)
@@ -73,9 +69,7 @@ class TestTask002AC2GetRunById:
         assert fetched.status == RunStatus.RECEIVED
 
 
-class TestTask002AC3UpdateStatus:
-    """Task002 AC-3 test_update_status"""
-
+class TestUpdateStatus:
     def test_update_status_changes_fields(self, repo) -> None:
         run = _make_run()
         repo.create(run)
@@ -85,9 +79,7 @@ class TestTask002AC3UpdateStatus:
         assert updated.updated_at == new_ts
 
 
-class TestTask002AC4UpdateProjection:
-    """Task002 AC-4 test_update_projection"""
-
+class TestUpdateProjection:
     def test_update_projection_sets_dict(self, repo) -> None:
         run = _make_run()
         repo.create(run)
@@ -98,9 +90,7 @@ class TestTask002AC4UpdateProjection:
         assert updated.updated_at == new_ts
 
 
-class TestTask002AC5RoundTripAllFields:
-    """Task002 AC-5 test_round_trip_all_fields"""
-
+class TestRoundTripAllFields:
     def test_all_7_fields_preserved(self, repo) -> None:
         run = _make_run(
             run_id="run-rt",
@@ -128,17 +118,13 @@ class TestTask002AC5RoundTripAllFields:
 # ---------------------------------------------------------------------------
 
 
-class TestTask002EC1GetNonexistentReturnsNone:
-    """Task002 EC-1 test_get_nonexistent_returns_none"""
-
+class TestGetNonexistentReturnsNone:
     def test_get_missing_id_returns_none(self, repo) -> None:
         result = repo.get("nonexistent-id")
         assert result is None
 
 
-class TestTask002EC2UpdateSameStatusIdempotent:
-    """Task002 EC-2 test_update_same_status_idempotent"""
-
+class TestUpdateSameStatusIdempotent:
     def test_update_to_same_status_changes_timestamp(self, repo) -> None:
         run = _make_run()
         repo.create(run)
@@ -153,9 +139,7 @@ class TestTask002EC2UpdateSameStatusIdempotent:
 # ---------------------------------------------------------------------------
 
 
-class TestTask002ERR1DuplicateRunIdRaises:
-    """Task002 ERR-1 test_duplicate_run_id_raises"""
-
+class TestDuplicateRunIdRaises:
     def test_duplicate_create_raises_integrity_error(self, repo) -> None:
         run = _make_run()
         repo.create(run)

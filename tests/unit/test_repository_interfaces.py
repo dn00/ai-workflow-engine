@@ -1,4 +1,4 @@
-"""Unit tests for abstract repository interfaces (Feature 005, Batch 01)."""
+"""Unit tests for abstract repository interfaces."""
 
 import inspect
 from datetime import datetime, timezone
@@ -21,33 +21,25 @@ from app.db.repositories.base import (
 # ---------------------------------------------------------------------------
 
 
-class TestTask001AC1RunRepoAbcNotInstantiable:
-    """Task001 AC-1 test_run_repo_abc_not_instantiable"""
-
+class TestRunRepoAbcNotInstantiable:
     def test_cannot_instantiate_abstract_run_repository(self) -> None:
         with pytest.raises(TypeError):
             AbstractRunRepository()  # type: ignore[abstract]
 
 
-class TestTask001AC2EventRepoAbcNotInstantiable:
-    """Task001 AC-2 test_event_repo_abc_not_instantiable"""
-
+class TestEventRepoAbcNotInstantiable:
     def test_cannot_instantiate_abstract_event_repository(self) -> None:
         with pytest.raises(TypeError):
             AbstractEventRepository()  # type: ignore[abstract]
 
 
-class TestTask001AC3ReviewRepoAbcNotInstantiable:
-    """Task001 AC-3 test_review_repo_abc_not_instantiable"""
-
+class TestReviewRepoAbcNotInstantiable:
     def test_cannot_instantiate_abstract_review_repository(self) -> None:
         with pytest.raises(TypeError):
             AbstractReviewRepository()  # type: ignore[abstract]
 
 
-class TestTask001AC4MethodSignaturesUseDomainModels:
-    """Task001 AC-4 test_method_signatures_use_domain_models"""
-
+class TestMethodSignaturesUseDomainModels:
     def test_run_repo_signatures_use_pydantic_models(self) -> None:
         hints = {
             "create": {"run": Run, "return": Run},
@@ -115,9 +107,7 @@ class TestTask001AC4MethodSignaturesUseDomainModels:
                 )
 
 
-class TestTask001AC5FkPragmaEnablesForeignKeys:
-    """Task001 AC-5 test_fk_pragma_enables_foreign_keys"""
-
+class TestFkPragmaEnablesForeignKeys:
     def test_fk_pragma_returns_1_after_enable(self) -> None:
         engine = create_engine("sqlite:///:memory:")
         enable_sqlite_fk_pragma(engine)
@@ -131,9 +121,7 @@ class TestTask001AC5FkPragmaEnablesForeignKeys:
 # ---------------------------------------------------------------------------
 
 
-class TestTask001EC1IncompleteSubclassRaisesTypeerror:
-    """Task001 EC-1 test_incomplete_subclass_raises_typeerror"""
-
+class TestIncompleteSubclassRaisesTypeerror:
     def test_subclass_missing_methods_raises_typeerror(self) -> None:
         class PartialRunRepo(AbstractRunRepository):
             def create(self, run: Run) -> Run:
@@ -154,9 +142,7 @@ class TestTask001EC1IncompleteSubclassRaisesTypeerror:
 # ---------------------------------------------------------------------------
 
 
-class TestTask001ERR1DirectInstantiationRaisesTypeerror:
-    """Task001 ERR-1 test_direct_instantiation_raises_typeerror"""
-
+class TestDirectInstantiationRaisesTypeerror:
     def test_direct_instantiation_error_mentions_abstract_methods(self) -> None:
         with pytest.raises(TypeError) as exc_info:
             AbstractRunRepository()  # type: ignore[abstract]

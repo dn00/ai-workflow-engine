@@ -12,13 +12,19 @@ describing an employee access request and extract structured data from it.
 You MUST return ONLY a JSON object with exactly these fields:
 - request_type (string): The type of request. Use "access_request".
 - employee_name (string or null): The employee's full name.
-- systems_requested (array of strings or null): Systems being requested.
+- systems_requested (array of strings): Systems being requested. Use the canonical
+  system identifiers listed below. If the request mentions a system that is not in the
+  list, use your best judgement to map it to the closest canonical name. If no match
+  exists, use a lowercase_snake_case identifier.
+  Known systems: salesforce, looker, jira, confluence, slack, google_workspace, github,
+  aws, azure, gcp, datadog.
+  Forbidden systems: admin_console, root_access, production_db.
 - manager_name (string or null): The approving manager's name.
 - start_date (string or null): Requested start date in YYYY-MM-DD format.
-- urgency (string or null): "normal", "high", or "low".
+- urgency (string): "normal", "high", or "low". Default to "normal" if not specified.
 - justification (string or null): Business justification for the request.
 - recommended_action (string or null): Suggested next step.
-- notes (array of strings or null): Any ambiguities or special considerations.
+- notes (array of strings): Any ambiguities or special considerations. Empty array if none.
 
 Return ONLY valid JSON. No markdown fences, no explanation, no extra text."""
 
@@ -30,5 +36,6 @@ def build_user_prompt(input_text: str) -> str:
 ---
 {input_text}
 ---
+
 
 Return a JSON object with the fields specified in your instructions."""
