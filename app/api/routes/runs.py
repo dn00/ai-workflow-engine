@@ -99,7 +99,7 @@ def create_run(
     except ValueError:
         raise HTTPException(status_code=400, detail=f"Invalid mode: {body.mode}")
     try:
-        result = runner.start_run(body.input_text, mode)
+        result = runner.start_run(body.input_text, mode, workflow_type=body.workflow_type)
     except RunnerError as exc:
         raise _map_runner_error(exc)
     return _serialize_run_result(result)

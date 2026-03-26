@@ -140,7 +140,9 @@ class LocalRunner(AbstractRunner):
     # Public commands
     # ------------------------------------------------------------------
 
-    def start_run(self, input_text: str, mode: RunMode) -> RunResult:
+    def start_run(
+        self, input_text: str, mode: RunMode, workflow_type: str = "access_request",
+    ) -> RunResult:
         """Orchestrate a new workflow run from raw input."""
         # Guard: REPLAY mode not allowed via start_run
         if mode == RunMode.REPLAY:
@@ -149,7 +151,7 @@ class LocalRunner(AbstractRunner):
             )
 
         # Create the run
-        run = Run(mode=mode)
+        run = Run(mode=mode, workflow_type=workflow_type)
         run = self._run_repo.create(run)
         run_id = run.run_id
         seq = 1

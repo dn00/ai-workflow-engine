@@ -15,6 +15,7 @@ class CreateRunRequest(BaseModel):
 
     input_text: str
     mode: str = "live"  # "live" or "dry_run"
+    workflow_type: str = "access_request"
 
 
 class SubmitReviewRequest(BaseModel):
