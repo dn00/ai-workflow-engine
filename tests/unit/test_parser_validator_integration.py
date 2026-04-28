@@ -110,6 +110,7 @@ class TestListWorkflowTypes:
 
         types = list_workflow_types()
         assert "access_request" in types
+        assert "invoice_exception" in types
 
 
 class TestPipelineForbiddenSystem:

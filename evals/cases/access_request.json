@@ -31,12 +31,12 @@
       "slices": ["access_request", "review"]
     },
     {
-      "name": "forbidden production database rejected",
+      "name": "forbidden production database fails validation",
       "workflow_type": "access_request",
       "input_text": "Give Jane production database root access.",
       "mock_response": "{\"request_type\":\"access_request\",\"employee_name\":\"Jane Doe\",\"systems_requested\":[\"production_db\"],\"manager_name\":\"Bob Lee\",\"start_date\":\"2026-05-01\",\"urgency\":\"normal\",\"justification\":\"Debugging\",\"recommended_action\":\"approve\",\"notes\":[]}",
       "expected": {
-        "status": "rejected",
+        "status": "proposal_invalid",
         "reason_codes_contains": ["forbidden_system"]
       },
       "slices": ["access_request", "blocked"]

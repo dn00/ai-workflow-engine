@@ -33,12 +33,12 @@
       "slices": ["invoice_intake", "review"]
     },
     {
-      "name": "flagged vendor rejected",
+      "name": "flagged vendor fails validation",
       "workflow_type": "invoice_intake",
       "input_text": "Invoice from flagged vendor.",
       "mock_response": "{\"request_type\":\"invoice_intake\",\"vendor_name\":\"Offshore Consulting Ltd\",\"invoice_number\":\"OFF-1\",\"invoice_date\":\"2026-05-01\",\"currency\":\"USD\",\"line_items\":[{\"description\":\"Services\",\"amount\":500}],\"total\":500,\"notes\":[]}",
       "expected": {
-        "status": "rejected",
+        "status": "proposal_invalid",
         "reason_codes_contains": ["flagged_vendor"]
       },
       "slices": ["invoice_intake", "blocked"]

@@ -94,8 +94,8 @@ make lint     # uv run --extra dev ruff check + format check
 make format   # uv run --extra dev ruff format + fix
 ```
 
-The current verified baseline is `510 passed, 1 warning` using `make test`.
-The current eval baseline is `7/7 passed` using `make eval`.
+The current verified baseline is `536 passed, 1 warning` using `make test`.
+The current eval baseline is `10/10 passed` using `make eval`.
 
 ## Project Structure
 
@@ -106,7 +106,7 @@ app/
   web/                # Jinja2 web UI routes
   templates/          # HTML templates
   core/               # Shared kernel: models, enums, reducer, replay, runners
-  workflows/          # Workflow modules (access_request, invoice_intake)
+  workflows/          # Workflow modules (access_request, invoice_intake, invoice_exception)
   effects/            # Effect adapters (simulated)
   llm/                # LLM adapters (mock, CLI via claude -p)
   retrieval/          # Document loading, chunking, retrieval, prompt context

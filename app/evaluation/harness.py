@@ -83,14 +83,19 @@ def _run_case(case: EvalCase) -> EvalResult:
         else:
             normalized = workflow.normalize_proposal(parse_result.proposal)
             validation = workflow.validate_proposal(parse_result.proposal, normalized)
-            decision = workflow.evaluate_policy(
-                parse_result.proposal,
-                normalized,
-                validation,
-            )
-            status = decision.status
-            normalized_fields = decision.normalized_fields
-            reason_codes = [str(code) for code in decision.reason_codes]
+            if not validation.is_valid:
+                status = "proposal_invalid"
+                normalized_fields = normalized.model_dump()
+                reason_codes = [str(error) for error in validation.errors]
+            else:
+                decision = workflow.evaluate_policy(
+                    parse_result.proposal,
+                    normalized,
+                    validation,
+                )
+                status = decision.status
+                normalized_fields = decision.normalized_fields
+                reason_codes = [str(code) for code in decision.reason_codes]
 
         if status != expected.status:
             errors.append(f"status expected {expected.status!r}, got {status!r}")

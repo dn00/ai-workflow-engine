@@ -59,6 +59,36 @@ def test_run_eval_cases_reports_status_mismatch() -> None:
     assert "status expected" in report.results[0].errors[0]
 
 
+def test_run_eval_cases_treats_validation_failure_as_proposal_invalid() -> None:
+    report = run_eval_cases(
+        [
+            _case(
+                mock_response=json.dumps(
+                    {
+                        "request_type": "access_request",
+                        "employee_name": "Jane Doe",
+                        "systems_requested": ["production_db"],
+                        "manager_name": "Bob Lee",
+                        "start_date": "2026-05-01",
+                        "urgency": "normal",
+                        "justification": "Debugging",
+                        "recommended_action": "approve",
+                        "notes": [],
+                    }
+                ),
+                expected=EvalExpected(
+                    status="proposal_invalid",
+                    reason_codes_contains=["forbidden_system"],
+                ),
+            )
+        ]
+    )
+
+    assert report.success is True
+    assert report.results[0].status == "proposal_invalid"
+    assert report.results[0].reason_code_matches == 1
+
+
 def test_run_eval_cases_reports_field_mismatch() -> None:
     report = run_eval_cases([
         _case(expected=EvalExpected(status="approved", fields={"employee_name": "Wrong"}))

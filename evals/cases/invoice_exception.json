@@ -1,0 +1,48 @@
+{
+  "cases": [
+    {
+      "name": "acme expedited shipping overage requires review",
+      "workflow_type": "invoice_exception",
+      "input_text": "Invoice INV-1042 from Acme is $18,750 but PO PO-9001 was approved for $15,000. The vendor says the difference is expedited shipping and weekend labor.",
+      "mock_response": "{\"request_type\":\"invoice_exception\",\"vendor_name\":\"Acme Corp\",\"invoice_number\":\"INV-1042\",\"po_number\":\"PO-9001\",\"invoice_amount\":18750,\"po_amount\":15000,\"currency\":\"USD\",\"discrepancy_reason\":\"Expedited shipping and weekend labor.\",\"line_items\":[{\"description\":\"Base services\",\"amount\":15000},{\"description\":\"Expedited shipping\",\"amount\":2500},{\"description\":\"Weekend labor\",\"amount\":1250}],\"cited_evidence_ids\":[\"invoice_overage_policy:0:abc\",\"vendor_surcharge_policy:0:def\"],\"notes\":[]}",
+      "expected": {
+        "status": "review_required",
+        "fields": {
+          "vendor_name": "Acme Corp",
+          "invoice_number": "INV-1042",
+          "overage_amount": 3750.0,
+          "overage_percent": 25.0
+        },
+        "reason_codes_contains": ["po_amount_exceeded", "unsupported_surcharge", "manager_approval_required"]
+      },
+      "slices": ["invoice_exception", "review", "surcharge"]
+    },
+    {
+      "name": "minor known vendor overage with evidence approved",
+      "workflow_type": "invoice_exception",
+      "input_text": "Acme invoice INV-1001 is $1,030 against PO PO-1001 for $1,000 due to tax rounding.",
+      "mock_response": "{\"request_type\":\"invoice_exception\",\"vendor_name\":\"Acme Corp\",\"invoice_number\":\"INV-1001\",\"po_number\":\"PO-1001\",\"invoice_amount\":1030,\"po_amount\":1000,\"currency\":\"USD\",\"discrepancy_reason\":\"Small tax rounding adjustment.\",\"line_items\":[{\"description\":\"Tax rounding\",\"amount\":30}],\"cited_evidence_ids\":[\"invoice_overage_policy:0:abc\"],\"notes\":[]}",
+      "expected": {
+        "status": "approved",
+        "fields": {
+          "overage_amount": 30.0,
+          "overage_percent": 3.0
+        },
+        "reason_codes_contains": ["minor_overage_with_evidence"],
+        "reason_codes_absent": ["unsupported_surcharge", "manager_approval_required"]
+      },
+      "slices": ["invoice_exception", "low_risk"]
+    },
+    {
+      "name": "flagged vendor rejected",
+      "workflow_type": "invoice_exception",
+      "input_text": "Invoice exception from Offshore Consulting Ltd.",
+      "mock_response": "{\"request_type\":\"invoice_exception\",\"vendor_name\":\"Offshore Consulting Ltd\",\"invoice_number\":\"OFF-404\",\"po_number\":\"PO-404\",\"invoice_amount\":9000,\"po_amount\":8000,\"currency\":\"USD\",\"discrepancy_reason\":\"Extra services.\",\"line_items\":[{\"description\":\"Extra services\",\"amount\":1000}],\"cited_evidence_ids\":[\"ap_approval_policy:0:abc\"],\"notes\":[]}",
+      "expected": {
+        "status": "rejected",
+        "reason_codes_contains": ["flagged_vendor"]
+      },
+      "slices": ["invoice_exception", "blocked"]
+    }
+  ]
+}
