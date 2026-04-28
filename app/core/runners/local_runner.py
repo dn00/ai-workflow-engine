@@ -5,17 +5,23 @@ Implements start_run (this module), submit_review and replay_run
 to workflow modules via the registry.
 """
 
+import json
 from datetime import datetime, timezone
+from typing import Any
 from uuid import uuid4
 
+from pydantic import BaseModel
+
+from app.core.artifacts.models import Artifact
 from app.core.enums import ActorType, EventType, ReviewDecision, RunMode, RunStatus
 from app.core.models import Event, ReviewTask, Run, VersionInfo
 from app.core.projections.models import RunProjection
 from app.core.projections.reducer import reduce_events
+from app.core.receipts.models import Receipt
 from app.core.replay.engine import replay_run as _replay_run_engine
 from app.core.replay.models import ReplayResult
-from app.core.receipts.models import Receipt
 from app.db.repositories.base import (
+    AbstractArtifactRepository,
     AbstractEventRepository,
     AbstractReceiptRepository,
     AbstractReviewRepository,
@@ -40,6 +46,7 @@ class LocalRunner(AbstractRunner):
         effect_adapter: AbstractEffectAdapter,
         llm_adapter: AbstractLLMAdapter,
         receipt_repo: AbstractReceiptRepository,
+        artifact_repo: AbstractArtifactRepository | None = None,
     ) -> None:
         self._run_repo = run_repo
         self._event_repo = event_repo
@@ -47,6 +54,7 @@ class LocalRunner(AbstractRunner):
         self._effect_adapter = effect_adapter
         self._llm_adapter = llm_adapter
         self._receipt_repo = receipt_repo
+        self._artifact_repo = artifact_repo
 
     # ------------------------------------------------------------------
     # Private helpers
@@ -91,6 +99,36 @@ class LocalRunner(AbstractRunner):
             run_id, projection.model_dump(), datetime.now(timezone.utc)
         )
         return projection
+
+    def _artifact_data(self, value: Any) -> dict:
+        """Serialize workflow artifacts into JSON-safe dictionaries."""
+        if isinstance(value, BaseModel):
+            return value.model_dump(mode="json")
+        if isinstance(value, dict):
+            return json.loads(json.dumps(value, default=str))
+        return {"value": json.loads(json.dumps(value, default=str))}
+
+    def _store_artifact(
+        self,
+        run_id: str,
+        workflow_type: str,
+        artifact_name: str,
+        schema_version: str,
+        value: Any,
+        source_receipt_id: str | None = None,
+    ) -> None:
+        """Persist an artifact when artifact storage is configured."""
+        if self._artifact_repo is None:
+            return
+        self._artifact_repo.create(
+            Artifact(
+                run_id=run_id,
+                artifact_type=f"{workflow_type}.{artifact_name}",
+                schema_version=schema_version,
+                data=self._artifact_data(value),
+                source_receipt_id=source_receipt_id,
+            )
+        )
 
     def _run_result(
         self, run_id: str, review_task: ReviewTask | None = None
@@ -184,7 +222,7 @@ class LocalRunner(AbstractRunner):
             prompt_version=llm_response.prompt_version,
             model_id=llm_response.model_id,
         )
-        self._receipt_repo.create(receipt)
+        receipt = self._receipt_repo.create(receipt)
 
         # Use real prompt_version from LLM for all subsequent events
         version_info = VersionInfo(prompt_version=llm_response.prompt_version)
@@ -202,6 +240,15 @@ class LocalRunner(AbstractRunner):
             self._update_status(run_id, RunStatus.PROPOSAL_INVALID)
             return self._run_result(run_id)
 
+        self._store_artifact(
+            run_id,
+            run.workflow_type,
+            "proposal",
+            version_info.proposal_schema_version,
+            parse_result.proposal,
+            source_receipt_id=receipt.receipt_id,
+        )
+
         # 3. proposal.generated
         self._emit(
             run_id, seq, EventType.PROPOSAL_GENERATED,
@@ -213,6 +260,14 @@ class LocalRunner(AbstractRunner):
 
         # 4. Normalize + validate
         normalized = wf.normalize_proposal(parse_result.proposal)
+        self._store_artifact(
+            run_id,
+            run.workflow_type,
+            "normalized",
+            version_info.proposal_schema_version,
+            normalized,
+            source_receipt_id=receipt.receipt_id,
+        )
         validation_result = wf.validate_proposal(parse_result.proposal, normalized)
 
         if not validation_result.is_valid:

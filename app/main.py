@@ -7,6 +7,7 @@ from fastapi import FastAPI
 
 from app.api.routes import runs_router
 from app.db.repositories import (
+    SQLiteArtifactRepository,
     SQLiteEventRepository,
     SQLiteReceiptRepository,
     SQLiteReviewRepository,
@@ -39,6 +40,7 @@ def create_app(
         event_repo = SQLiteEventRepository(sf)
         review_repo = SQLiteReviewRepository(sf)
         receipt_repo = SQLiteReceiptRepository(sf)
+        artifact_repo = SQLiteArtifactRepository(sf)
 
         # Create adapters
         effect_adapter = SimulatedEffectAdapter()
@@ -59,6 +61,7 @@ def create_app(
             effect_adapter=effect_adapter,
             llm_adapter=adapter,
             receipt_repo=receipt_repo,
+            artifact_repo=artifact_repo,
         )
 
         # Store on app.state for dependency injection
@@ -67,6 +70,7 @@ def create_app(
         fastapi_app.state.event_repo = event_repo
         fastapi_app.state.receipt_repo = receipt_repo
         fastapi_app.state.review_repo = review_repo
+        fastapi_app.state.artifact_repo = artifact_repo
 
         yield
 

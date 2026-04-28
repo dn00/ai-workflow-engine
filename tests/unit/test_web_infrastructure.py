@@ -1,13 +1,17 @@
 """Tests for web UI infrastructure + intake screen.
 """
 
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 from starlette.testclient import TestClient
 
-from app.core.enums import RunMode, EventType
 from app.core.runners.base import RunnerError
-from app.db.repositories.base import AbstractReceiptRepository, AbstractReviewRepository
+from app.db.repositories.base import (
+    AbstractArtifactRepository,
+    AbstractReceiptRepository,
+    AbstractReviewRepository,
+)
 from app.main import create_app
 
 
@@ -49,8 +53,10 @@ def test_app_state_exposes_receipt_and_review_repos(client: TestClient):
     app = client.app
     assert hasattr(app.state, "receipt_repo")
     assert hasattr(app.state, "review_repo")
+    assert hasattr(app.state, "artifact_repo")
     assert isinstance(app.state.receipt_repo, AbstractReceiptRepository)
     assert isinstance(app.state.review_repo, AbstractReviewRepository)
+    assert isinstance(app.state.artifact_repo, AbstractArtifactRepository)
 
 
 # ---------------------------------------------------------------------------

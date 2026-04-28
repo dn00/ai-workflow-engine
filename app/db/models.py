@@ -58,3 +58,17 @@ class ReceiptRow(Base):
     prompt_version: Mapped[str] = mapped_column(String, nullable=False)
     model_id: Mapped[str | None] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class ArtifactRow(Base):
+    __tablename__ = "artifacts"
+
+    artifact_id: Mapped[str] = mapped_column(String, primary_key=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("runs.run_id"), nullable=False)
+    artifact_type: Mapped[str] = mapped_column(String, nullable=False)
+    schema_version: Mapped[str] = mapped_column(String, nullable=False)
+    data_json: Mapped[dict] = mapped_column(JSON, nullable=False)
+    source_receipt_id: Mapped[str | None] = mapped_column(
+        ForeignKey("receipts.receipt_id"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

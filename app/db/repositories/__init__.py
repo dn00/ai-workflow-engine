@@ -1,6 +1,8 @@
 """Public API for repository layer."""
 
+from app.db.repositories.artifact_repository import SQLiteArtifactRepository
 from app.db.repositories.base import (
+    AbstractArtifactRepository,
     AbstractEventRepository,
     AbstractReceiptRepository,
     AbstractReviewRepository,
@@ -14,10 +16,12 @@ from app.db.repositories.run_repository import SQLiteRunRepository
 
 __all__ = [
     "AbstractRunRepository",
+    "AbstractArtifactRepository",
     "AbstractEventRepository",
     "AbstractReviewRepository",
     "AbstractReceiptRepository",
     "SQLiteRunRepository",
+    "SQLiteArtifactRepository",
     "SQLiteEventRepository",
     "SQLiteReviewRepository",
     "SQLiteReceiptRepository",

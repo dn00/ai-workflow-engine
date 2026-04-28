@@ -24,11 +24,17 @@ class TestGetEngineSqlite:
 
 
 class TestInitDbCreatesTables:
-    def test_creates_all_three_tables(self) -> None:
+    def test_creates_all_tables(self) -> None:
         engine = get_engine("sqlite:///:memory:")
         init_db(engine)
         table_names = sorted(inspect(engine).get_table_names())
-        assert table_names == ["events", "receipts", "reviews", "runs"]
+        assert table_names == [
+            "artifacts",
+            "events",
+            "receipts",
+            "reviews",
+            "runs",
+        ]
 
 
 class TestSessionFactoryWorks:
@@ -52,12 +58,19 @@ class TestInitDbIdempotent:
         init_db(engine)
         init_db(engine)  # second call should not raise
         table_names = sorted(inspect(engine).get_table_names())
-        assert table_names == ["events", "receipts", "reviews", "runs"]
+        assert table_names == [
+            "artifacts",
+            "events",
+            "receipts",
+            "reviews",
+            "runs",
+        ]
 
 
 class TestModuleExports:
     def test_all_public_symbols_importable_from_app_db(self) -> None:
         from app.db import (
+            ArtifactRow,
             Base,
             EventRow,
             ReviewRow,
@@ -69,6 +82,7 @@ class TestModuleExports:
 
         # Verify they are the actual symbols, not None
         assert Base is not None
+        assert ArtifactRow is not None
         assert RunRow is not None
         assert EventRow is not None
         assert ReviewRow is not None

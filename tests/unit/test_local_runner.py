@@ -1,6 +1,5 @@
 """Tests for LocalRunner start_run + helpers."""
 
-from datetime import datetime, timezone
 from types import ModuleType
 from unittest.mock import MagicMock, patch
 
@@ -8,20 +7,18 @@ import pytest
 from pydantic import BaseModel
 
 from app.core.enums import (
-    ActorType,
     EventType,
     ReviewDecision,
     RunMode,
     RunStatus,
 )
-from app.core.models import Event, ReviewTask, Run, ValidatedDecision, VersionInfo
-from app.core.projections.models import RunProjection
+from app.core.models import Event, Run, ValidatedDecision
+from app.core.replay.models import ReplayResult
 from app.core.runners.base import RunnerError
 from app.core.runners.local_runner import LocalRunner
 from app.core.runners.models import RunResult
 from app.llm.base import LLMAdapterError
 from app.llm.mock_adapter import MockLLMAdapter
-
 
 # ---------------------------------------------------------------------------
 # Helpers — mock workflow module + repos
@@ -49,7 +46,9 @@ def _make_workflow_module(
 
     if parse_success:
         mod.parse_proposal = MagicMock(
-            return_value=_FakeParseResult(success=True, proposal={"request_type": "access_request"})
+            return_value=_FakeParseResult(
+                success=True, proposal={"request_type": "access_request"}
+            )
         )
     else:
         mod.parse_proposal = MagicMock(
@@ -59,7 +58,10 @@ def _make_workflow_module(
     mod.normalize_proposal = MagicMock(return_value=MagicMock())
 
     mod.validate_proposal = MagicMock(
-        return_value=_FakeValidationResult(is_valid=validation_valid, errors=[] if validation_valid else ["validation error"])
+        return_value=_FakeValidationResult(
+            is_valid=validation_valid,
+            errors=[] if validation_valid else ["validation error"],
+        )
     )
 
     mod.evaluate_policy = MagicMock(
@@ -101,9 +103,13 @@ def _make_repos():
     # run_repo.get returns a run
     run_repo.get.side_effect = lambda run_id: Run(run_id=run_id)
     # run_repo.update_status returns a run
-    run_repo.update_status.side_effect = lambda rid, status, ts: Run(run_id=rid, status=status)
+    run_repo.update_status.side_effect = lambda rid, status, ts: Run(
+        run_id=rid, status=status
+    )
     # run_repo.update_projection returns a run
-    run_repo.update_projection.side_effect = lambda rid, proj, ts: Run(run_id=rid, current_projection=proj)
+    run_repo.update_projection.side_effect = lambda rid, proj, ts: Run(
+        run_id=rid, current_projection=proj
+    )
 
     # review_repo.create returns whatever is passed in
     review_repo.create.side_effect = lambda r: r
@@ -247,7 +253,11 @@ def test_start_run_rejected():
 def test_start_run_review_required():
     run_repo, event_repo, review_repo, receipt_repo, events = _make_repos()
     adapter = _make_effect_adapter()
-    wf = _make_workflow_module(parse_success=True, validation_valid=True, policy_status="review_required")
+    wf = _make_workflow_module(
+        parse_success=True,
+        validation_valid=True,
+        policy_status="review_required",
+    )
 
     llm_adapter = MockLLMAdapter()
     runner = LocalRunner(run_repo, event_repo, review_repo, adapter, llm_adapter, receipt_repo)
@@ -428,7 +438,8 @@ def test_start_run_calls_llm_and_stores_receipt():
     from app.core.receipts.models import Receipt
 
     assert isinstance(receipt_arg, Receipt)
-    assert receipt_arg.raw_response == llm_adapter.generate_proposal("some input", "access_request").raw_response
+    llm_response = llm_adapter.generate_proposal("some input", "access_request")
+    assert receipt_arg.raw_response == llm_response.raw_response
 
 
 # ---------------------------------------------------------------------------
@@ -514,6 +525,43 @@ def test_start_run_parse_failure_stores_receipt():
     # Even though parse failed, receipt should still be stored
     receipt_repo.create.assert_called_once()
     assert result.projection.status == RunStatus.PROPOSAL_INVALID
+
+
+# ---------------------------------------------------------------------------
+# Successful parse stores inspectable artifacts when repository is configured
+# ---------------------------------------------------------------------------
+
+
+def test_start_run_stores_proposal_and_normalized_artifacts():
+    run_repo, event_repo, review_repo, receipt_repo, _events = _make_repos()
+    artifact_repo = MagicMock()
+    adapter = _make_effect_adapter()
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(
+        run_repo,
+        event_repo,
+        review_repo,
+        adapter,
+        llm_adapter,
+        receipt_repo,
+        artifact_repo=artifact_repo,
+    )
+    wf = _make_workflow_module(
+        parse_success=True, validation_valid=True, policy_status="approved"
+    )
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        runner.start_run("input", RunMode.LIVE)
+
+    assert artifact_repo.create.call_count == 2
+    artifact_types = [
+        call.args[0].artifact_type for call in artifact_repo.create.call_args_list
+    ]
+    assert artifact_types == [
+        "access_request.proposal",
+        "access_request.normalized",
+    ]
+    assert artifact_repo.create.call_args_list[0].args[0].source_receipt_id
 
 
 # ---------------------------------------------------------------------------
@@ -666,9 +714,7 @@ def test_replay_run_delegates_to_engine():
         run_id=rid, current_projection={"run_id": rid, "status": "completed"}
     )
 
-    from app.core.replay.models import ReplayResult as RR
-
-    mock_replay_result = RR(run_id="r-1", match=True, event_count=7)
+    mock_replay_result = ReplayResult(run_id="r-1", match=True, event_count=7)
 
     with patch(
         "app.core.runners.local_runner._replay_run_engine",
@@ -676,7 +722,7 @@ def test_replay_run_delegates_to_engine():
     ) as mock_engine:
         result = runner.replay_run("r-1")
 
-    assert isinstance(result, RR)
+    assert isinstance(result, ReplayResult)
     assert result.match is True
     mock_engine.assert_called_once()
 
@@ -727,11 +773,9 @@ def test_replay_run_no_events():
     run_repo.get.side_effect = lambda rid: Run(run_id=rid, current_projection=None)
     # event_repo.list_by_run returns empty (no events for this run)
 
-    from app.core.replay.models import ReplayResult as RR
-
     result = runner.replay_run("r-empty")
 
-    assert isinstance(result, RR)
+    assert isinstance(result, ReplayResult)
     # Replay engine handles empty events → error
     assert result.error is not None
 

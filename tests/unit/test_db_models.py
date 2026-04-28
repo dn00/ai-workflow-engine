@@ -7,7 +7,7 @@ from sqlalchemy import JSON, DateTime, Integer, String, create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.db.models import Base, EventRow, ReviewRow, RunRow
+from app.db.models import ArtifactRow, Base, EventRow, ReviewRow, RunRow
 
 # ---------------------------------------------------------------------------
 # AC Tests
@@ -95,6 +95,33 @@ class TestReviewRowColumns:
         assert cols["review_id"].primary_key is True
 
 
+class TestArtifactRowColumns:
+    def test_artifact_row_has_seven_columns(self) -> None:
+        table = ArtifactRow.__table__
+        assert len(table.columns) == 7
+
+    def test_artifact_row_column_names_and_types(self) -> None:
+        cols = {c.name: c for c in ArtifactRow.__table__.columns}
+        expected = {
+            "artifact_id": String,
+            "run_id": String,
+            "artifact_type": String,
+            "schema_version": String,
+            "data_json": JSON,
+            "source_receipt_id": String,
+            "created_at": DateTime,
+        }
+        for name, expected_type in expected.items():
+            assert name in cols, f"Missing column: {name}"
+            assert isinstance(cols[name].type, expected_type), (
+                f"Column {name}: expected {expected_type}, got {type(cols[name].type)}"
+            )
+
+    def test_artifact_row_primary_key(self) -> None:
+        cols = {c.name: c for c in ArtifactRow.__table__.columns}
+        assert cols["artifact_id"].primary_key is True
+
+
 class TestForeignKeyConstraints:
     def test_event_row_fk_references_runs(self) -> None:
         cols = {c.name: c for c in EventRow.__table__.columns}
@@ -107,6 +134,15 @@ class TestForeignKeyConstraints:
         fks = list(cols["run_id"].foreign_keys)
         assert len(fks) == 1
         assert fks[0].target_fullname == "runs.run_id"
+
+    def test_artifact_row_fk_references_runs_and_receipts(self) -> None:
+        cols = {c.name: c for c in ArtifactRow.__table__.columns}
+        run_fks = list(cols["run_id"].foreign_keys)
+        receipt_fks = list(cols["source_receipt_id"].foreign_keys)
+        assert len(run_fks) == 1
+        assert run_fks[0].target_fullname == "runs.run_id"
+        assert len(receipt_fks) == 1
+        assert receipt_fks[0].target_fullname == "receipts.receipt_id"
 
 
 # ---------------------------------------------------------------------------

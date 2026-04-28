@@ -1,15 +1,16 @@
 """Unit tests for abstract repository interfaces."""
 
 import inspect
-from datetime import datetime, timezone
+from datetime import datetime
 
 import pytest
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import Session
 
+from app.core.artifacts.models import Artifact
 from app.core.enums import ReviewDecision, RunStatus
 from app.core.models import Event, ReviewTask, Run
 from app.db.repositories.base import (
+    AbstractArtifactRepository,
     AbstractEventRepository,
     AbstractReviewRepository,
     AbstractRunRepository,
@@ -37,6 +38,12 @@ class TestReviewRepoAbcNotInstantiable:
     def test_cannot_instantiate_abstract_review_repository(self) -> None:
         with pytest.raises(TypeError):
             AbstractReviewRepository()  # type: ignore[abstract]
+
+
+class TestArtifactRepoAbcNotInstantiable:
+    def test_cannot_instantiate_abstract_artifact_repository(self) -> None:
+        with pytest.raises(TypeError):
+            AbstractArtifactRepository()  # type: ignore[abstract]
 
 
 class TestMethodSignaturesUseDomainModels:
@@ -97,6 +104,22 @@ class TestMethodSignaturesUseDomainModels:
         }
         for method_name, expected in hints.items():
             method = getattr(AbstractReviewRepository, method_name)
+            annotations = inspect.get_annotations(method)
+            for param, expected_type in expected.items():
+                assert param in annotations, (
+                    f"{method_name} missing annotation for '{param}'"
+                )
+                assert annotations[param] == expected_type, (
+                    f"{method_name}.{param}: expected {expected_type}, got {annotations[param]}"
+                )
+
+    def test_artifact_repo_signatures_use_pydantic_models(self) -> None:
+        hints = {
+            "create": {"artifact": Artifact, "return": Artifact},
+            "list_by_run": {"run_id": str, "return": list[Artifact]},
+        }
+        for method_name, expected in hints.items():
+            method = getattr(AbstractArtifactRepository, method_name)
             annotations = inspect.get_annotations(method)
             for param, expected_type in expected.items():
                 assert param in annotations, (

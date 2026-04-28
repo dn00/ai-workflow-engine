@@ -2,8 +2,9 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from app.core.artifacts.models import Artifact
 from app.core.models import Event, Run
 from app.core.receipts.models import Receipt
 
@@ -16,6 +17,7 @@ class ReplayBundle(BaseModel):
     run: Run
     events: list[Event]
     receipt: Receipt | None = None
+    artifacts: list[Artifact] = Field(default_factory=list)
     projection: dict | None = None
 
 

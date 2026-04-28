@@ -5,10 +5,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from app.core.artifacts.models import Artifact
 from app.core.enums import ActorType, EventType, RunMode, RunStatus
 from app.core.models import Event, Run, VersionInfo
 from app.core.receipts.models import Receipt
-
 
 # ---------------------------------------------------------------------------
 # Helpers — mock repos
@@ -46,10 +46,20 @@ def _make_receipt(run_id: str) -> Receipt:
     )
 
 
+def _make_artifact(run_id: str) -> Artifact:
+    return Artifact(
+        run_id=run_id,
+        artifact_type="access_request.proposal",
+        data={"request_type": "access_request"},
+        source_receipt_id="receipt-1",
+    )
+
+
 def _mock_repos(
     run: Run | None,
     events: list[Event] | None = None,
     receipt: Receipt | None = None,
+    artifacts: list[Artifact] | None = None,
 ):
     run_repo = MagicMock()
     run_repo.get.return_value = run
@@ -60,7 +70,10 @@ def _mock_repos(
     receipt_repo = MagicMock()
     receipt_repo.get_by_run.return_value = receipt
 
-    return run_repo, event_repo, receipt_repo
+    artifact_repo = MagicMock()
+    artifact_repo.list_by_run.return_value = artifacts if artifacts is not None else []
+
+    return run_repo, event_repo, receipt_repo, artifact_repo
 
 
 # ---------------------------------------------------------------------------
@@ -75,13 +88,19 @@ class TestAssembleBundleCompleteRun:
         run = _make_run(projection={"status": "completed"})
         events = [_make_event("run-1", seq=1), _make_event("run-1", seq=2)]
         receipt = _make_receipt("run-1")
-        run_repo, event_repo, receipt_repo = _mock_repos(run, events, receipt)
+        artifacts = [_make_artifact("run-1")]
+        run_repo, event_repo, receipt_repo, artifact_repo = _mock_repos(
+            run, events, receipt, artifacts
+        )
 
-        bundle = assemble_bundle("run-1", run_repo, event_repo, receipt_repo)
+        bundle = assemble_bundle(
+            "run-1", run_repo, event_repo, receipt_repo, artifact_repo
+        )
 
         assert bundle.run == run
         assert bundle.events == events
         assert bundle.receipt == receipt
+        assert bundle.artifacts == artifacts
         assert bundle.projection == run.current_projection
 
 
@@ -96,7 +115,9 @@ class TestBundleMetadataFields:
 
         run = _make_run()
         events = [_make_event("run-1", seq=1)]
-        run_repo, event_repo, receipt_repo = _mock_repos(run, events, None)
+        run_repo, event_repo, receipt_repo, _artifact_repo = _mock_repos(
+            run, events, None
+        )
 
         before = datetime.now(timezone.utc)
         bundle = assemble_bundle("run-1", run_repo, event_repo, receipt_repo)
@@ -118,7 +139,9 @@ class TestBundleEventsOrderedBySeq:
         run = _make_run()
         # list_by_run returns events in seq order per spec
         events = [_make_event("run-1", seq=i) for i in range(1, 4)]
-        run_repo, event_repo, receipt_repo = _mock_repos(run, events, None)
+        run_repo, event_repo, receipt_repo, _artifact_repo = _mock_repos(
+            run, events, None
+        )
 
         bundle = assemble_bundle("run-1", run_repo, event_repo, receipt_repo)
 
@@ -161,7 +184,9 @@ class TestBundleNoReceipt:
 
         run = _make_run()
         events = [_make_event("run-1", seq=1)]
-        run_repo, event_repo, receipt_repo = _mock_repos(run, events, None)
+        run_repo, event_repo, receipt_repo, _artifact_repo = _mock_repos(
+            run, events, None
+        )
 
         bundle = assemble_bundle("run-1", run_repo, event_repo, receipt_repo)
 
@@ -179,7 +204,9 @@ class TestBundleNoProjection:
 
         run = _make_run(projection=None)
         events = [_make_event("run-1", seq=1)]
-        run_repo, event_repo, receipt_repo = _mock_repos(run, events, None)
+        run_repo, event_repo, receipt_repo, _artifact_repo = _mock_repos(
+            run, events, None
+        )
 
         bundle = assemble_bundle("run-1", run_repo, event_repo, receipt_repo)
 
@@ -195,7 +222,7 @@ class TestBundleUnknownRun:
     def test_bundle_unknown_run(self):
         from app.core.bundle import BundleError, assemble_bundle
 
-        run_repo, event_repo, receipt_repo = _mock_repos(run=None)
+        run_repo, event_repo, receipt_repo, _artifact_repo = _mock_repos(run=None)
 
         with pytest.raises(BundleError, match="Run not found"):
             assemble_bundle("nonexistent", run_repo, event_repo, receipt_repo)
@@ -211,7 +238,9 @@ class TestBundleNoEvents:
         from app.core.bundle import BundleError, assemble_bundle
 
         run = _make_run()
-        run_repo, event_repo, receipt_repo = _mock_repos(run, events=[], receipt=None)
+        run_repo, event_repo, receipt_repo, _artifact_repo = _mock_repos(
+            run, events=[], receipt=None
+        )
 
         with pytest.raises(BundleError, match="No events found"):
             assemble_bundle("run-1", run_repo, event_repo, receipt_repo)

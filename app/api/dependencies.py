@@ -4,6 +4,7 @@ from fastapi import Request
 
 from app.core.runners.local_runner import LocalRunner
 from app.db.repositories.base import (
+    AbstractArtifactRepository,
     AbstractEventRepository,
     AbstractReceiptRepository,
     AbstractReviewRepository,
@@ -34,3 +35,8 @@ def get_receipt_repo(request: Request) -> AbstractReceiptRepository:
 def get_review_repo(request: Request) -> AbstractReviewRepository:
     """Retrieve the review repository from app state."""
     return request.app.state.review_repo
+
+
+def get_artifact_repo(request: Request) -> AbstractArtifactRepository:
+    """Retrieve the artifact repository from app state."""
+    return request.app.state.artifact_repo

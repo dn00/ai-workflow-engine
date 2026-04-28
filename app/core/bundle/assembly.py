@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 from app.core.bundle.models import BundleError, ReplayBundle
 from app.db.repositories.base import (
+    AbstractArtifactRepository,
     AbstractEventRepository,
     AbstractReceiptRepository,
     AbstractRunRepository,
@@ -15,6 +16,7 @@ def assemble_bundle(
     run_repo: AbstractRunRepository,
     event_repo: AbstractEventRepository,
     receipt_repo: AbstractReceiptRepository,
+    artifact_repo: AbstractArtifactRepository | None = None,
 ) -> ReplayBundle:
     """Assemble a replay bundle from DB state (INV-6.2)."""
     run = run_repo.get(run_id)
@@ -26,11 +28,13 @@ def assemble_bundle(
         raise BundleError(f"No events found for run: {run_id}")
 
     receipt = receipt_repo.get_by_run(run_id)
+    artifacts = artifact_repo.list_by_run(run_id) if artifact_repo else []
 
     return ReplayBundle(
         exported_at=datetime.now(timezone.utc),
         run=run,
         events=events,
         receipt=receipt,
+        artifacts=artifacts,
         projection=run.current_projection,
     )
