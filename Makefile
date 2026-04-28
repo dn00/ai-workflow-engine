@@ -1,18 +1,18 @@
 .PHONY: test lint format demo export-bundle install
 
 test:
-	pytest
+	uv run --extra dev pytest -q
 
 lint:
-	ruff check .
-	ruff format --check .
+	uv run --extra dev ruff check .
+	uv run --extra dev ruff format --check .
 
 format:
-	ruff format .
-	ruff check --fix .
+	uv run --extra dev ruff format .
+	uv run --extra dev ruff check --fix .
 
 install:
-	pip install -e ".[dev]"
+	uv sync --extra dev
 
 demo:
 	@mkdir -p data

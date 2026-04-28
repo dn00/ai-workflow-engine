@@ -6,7 +6,7 @@ A production-shaped AI workflow automation system that converts unstructured acc
 
 ## Quick Start
 
-**Prerequisites:** Python >= 3.11, [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (optional, for real LLM calls)
+**Prerequisites:** Python >= 3.11, `uv`, [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (optional, for real LLM calls)
 
 ```bash
 # Install dependencies
@@ -88,9 +88,9 @@ See [docs/architecture.md](docs/architecture.md) for the full design including s
 ## Testing
 
 ```bash
-make test     # Run the test suite
-make lint     # Lint with ruff
-make format   # Auto-format
+make test     # uv run --extra dev pytest -q
+make lint     # uv run --extra dev ruff check + format check
+make format   # uv run --extra dev ruff format + fix
 ```
 
 ## Project Structure
@@ -102,7 +102,7 @@ app/
   web/                # Jinja2 web UI routes
   templates/          # HTML templates
   core/               # Shared kernel: models, enums, reducer, replay, runners
-  workflows/          # Workflow modules (access_request: parse, validate, policy)
+  workflows/          # Workflow modules (access_request, invoice_intake)
   effects/            # Effect adapters (simulated)
   llm/                # LLM adapters (mock, CLI via claude -p)
   db/                 # SQLite persistence + abstract repositories
