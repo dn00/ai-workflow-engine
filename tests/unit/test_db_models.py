@@ -7,7 +7,15 @@ from sqlalchemy import JSON, DateTime, Integer, String, create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.db.models import ArtifactRow, Base, EventRow, LLMTraceRow, ReviewRow, RunRow
+from app.db.models import (
+    ArtifactRow,
+    Base,
+    EventRow,
+    LLMTraceRow,
+    RetrievalTraceRow,
+    ReviewRow,
+    RunRow,
+)
 
 # ---------------------------------------------------------------------------
 # AC Tests
@@ -133,6 +141,18 @@ class TestLLMTraceRowColumns:
         assert isinstance(cols["reason_codes_json"].type, JSON)
 
 
+class TestRetrievalTraceRowColumns:
+    def test_retrieval_trace_row_has_ten_columns(self) -> None:
+        table = RetrievalTraceRow.__table__
+        assert len(table.columns) == 10
+
+    def test_retrieval_trace_row_primary_key(self) -> None:
+        cols = {c.name: c for c in RetrievalTraceRow.__table__.columns}
+        assert cols["trace_id"].primary_key is True
+        assert isinstance(cols["filters_json"].type, JSON)
+        assert isinstance(cols["retrieved_chunk_ids_json"].type, JSON)
+
+
 class TestForeignKeyConstraints:
     def test_event_row_fk_references_runs(self) -> None:
         cols = {c.name: c for c in EventRow.__table__.columns}
@@ -157,6 +177,12 @@ class TestForeignKeyConstraints:
 
     def test_llm_trace_row_fk_references_runs(self) -> None:
         cols = {c.name: c for c in LLMTraceRow.__table__.columns}
+        fks = list(cols["run_id"].foreign_keys)
+        assert len(fks) == 1
+        assert fks[0].target_fullname == "runs.run_id"
+
+    def test_retrieval_trace_row_fk_references_runs(self) -> None:
+        cols = {c.name: c for c in RetrievalTraceRow.__table__.columns}
         fks = list(cols["run_id"].foreign_keys)
         assert len(fks) == 1
         assert fks[0].target_fullname == "runs.run_id"

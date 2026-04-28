@@ -8,6 +8,7 @@ from app.db.repositories.base import (
     AbstractEventRepository,
     AbstractLLMTraceRepository,
     AbstractReceiptRepository,
+    AbstractRetrievalTraceRepository,
     AbstractRunRepository,
 )
 
@@ -19,6 +20,7 @@ def assemble_bundle(
     receipt_repo: AbstractReceiptRepository,
     artifact_repo: AbstractArtifactRepository | None = None,
     llm_trace_repo: AbstractLLMTraceRepository | None = None,
+    retrieval_trace_repo: AbstractRetrievalTraceRepository | None = None,
 ) -> ReplayBundle:
     """Assemble a replay bundle from DB state (INV-6.2)."""
     run = run_repo.get(run_id)
@@ -32,6 +34,9 @@ def assemble_bundle(
     receipt = receipt_repo.get_by_run(run_id)
     artifacts = artifact_repo.list_by_run(run_id) if artifact_repo else []
     llm_traces = llm_trace_repo.list_by_run(run_id) if llm_trace_repo else []
+    retrieval_traces = (
+        retrieval_trace_repo.list_by_run(run_id) if retrieval_trace_repo else []
+    )
 
     return ReplayBundle(
         exported_at=datetime.now(timezone.utc),
@@ -40,5 +45,6 @@ def assemble_bundle(
         receipt=receipt,
         artifacts=artifacts,
         llm_traces=llm_traces,
+        retrieval_traces=retrieval_traces,
         projection=run.current_projection,
     )

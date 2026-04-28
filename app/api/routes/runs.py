@@ -7,6 +7,7 @@ from app.api.dependencies import (
     get_event_repo,
     get_llm_trace_repo,
     get_receipt_repo,
+    get_retrieval_trace_repo,
     get_run_repo,
     get_runner,
 )
@@ -31,6 +32,7 @@ from app.db.repositories.base import (
     AbstractEventRepository,
     AbstractLLMTraceRepository,
     AbstractReceiptRepository,
+    AbstractRetrievalTraceRepository,
     AbstractRunRepository,
 )
 
@@ -186,6 +188,9 @@ def get_run_bundle(
     receipt_repo: AbstractReceiptRepository = Depends(get_receipt_repo),
     artifact_repo: AbstractArtifactRepository = Depends(get_artifact_repo),
     llm_trace_repo: AbstractLLMTraceRepository = Depends(get_llm_trace_repo),
+    retrieval_trace_repo: AbstractRetrievalTraceRepository = Depends(
+        get_retrieval_trace_repo
+    ),
 ):
     """Export replay bundle for a run (spec §25)."""
     try:
@@ -196,6 +201,7 @@ def get_run_bundle(
             receipt_repo,
             artifact_repo,
             llm_trace_repo,
+            retrieval_trace_repo,
         )
     except BundleError as exc:
         status = 404 if "not found" in str(exc).lower() else 400

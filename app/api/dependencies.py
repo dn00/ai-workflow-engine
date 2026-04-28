@@ -8,6 +8,7 @@ from app.db.repositories.base import (
     AbstractEventRepository,
     AbstractLLMTraceRepository,
     AbstractReceiptRepository,
+    AbstractRetrievalTraceRepository,
     AbstractReviewRepository,
     AbstractRunRepository,
 )
@@ -46,3 +47,8 @@ def get_artifact_repo(request: Request) -> AbstractArtifactRepository:
 def get_llm_trace_repo(request: Request) -> AbstractLLMTraceRepository:
     """Retrieve the LLM trace repository from app state."""
     return request.app.state.llm_trace_repo
+
+
+def get_retrieval_trace_repo(request: Request) -> AbstractRetrievalTraceRepository:
+    """Retrieve the retrieval trace repository from app state."""
+    return request.app.state.retrieval_trace_repo

@@ -33,6 +33,7 @@ class TestInitDbCreatesTables:
             "events",
             "llm_traces",
             "receipts",
+            "retrieval_traces",
             "reviews",
             "runs",
         ]
@@ -64,6 +65,7 @@ class TestInitDbIdempotent:
             "events",
             "llm_traces",
             "receipts",
+            "retrieval_traces",
             "reviews",
             "runs",
         ]
@@ -76,6 +78,7 @@ class TestModuleExports:
             Base,
             EventRow,
             LLMTraceRow,
+            RetrievalTraceRow,
             ReviewRow,
             RunRow,
             get_engine,
@@ -89,6 +92,7 @@ class TestModuleExports:
         assert RunRow is not None
         assert EventRow is not None
         assert LLMTraceRow is not None
+        assert RetrievalTraceRow is not None
         assert ReviewRow is not None
         assert get_engine is not None
         assert get_session_factory is not None

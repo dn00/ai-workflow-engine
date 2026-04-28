@@ -8,6 +8,7 @@ from app.core.artifacts.models import Artifact
 from app.core.models import Event, Run
 from app.core.receipts.models import Receipt
 from app.observability.llm_traces import LLMTrace
+from app.retrieval.traces import RetrievalTrace
 
 
 class ReplayBundle(BaseModel):
@@ -20,6 +21,7 @@ class ReplayBundle(BaseModel):
     receipt: Receipt | None = None
     artifacts: list[Artifact] = Field(default_factory=list)
     llm_traces: list[LLMTrace] = Field(default_factory=list)
+    retrieval_traces: list[RetrievalTrace] = Field(default_factory=list)
     projection: dict | None = None
 
 

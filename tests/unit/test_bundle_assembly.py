@@ -10,6 +10,7 @@ from app.core.enums import ActorType, EventType, RunMode, RunStatus
 from app.core.models import Event, Run, VersionInfo
 from app.core.receipts.models import Receipt
 from app.observability.llm_traces import LLMTrace
+from app.retrieval.traces import RetrievalTrace
 
 # ---------------------------------------------------------------------------
 # Helpers — mock repos
@@ -69,12 +70,24 @@ def _make_llm_trace(run_id: str) -> LLMTrace:
     )
 
 
+def _make_retrieval_trace(run_id: str) -> RetrievalTrace:
+    return RetrievalTrace(
+        run_id=run_id,
+        workflow_type="access_request",
+        query="access request policy",
+        top_k=2,
+        retrieved_chunk_ids=["policy:0"],
+        sufficient=True,
+    )
+
+
 def _mock_repos(
     run: Run | None,
     events: list[Event] | None = None,
     receipt: Receipt | None = None,
     artifacts: list[Artifact] | None = None,
     llm_traces: list[LLMTrace] | None = None,
+    retrieval_traces: list[RetrievalTrace] | None = None,
 ):
     run_repo = MagicMock()
     run_repo.get.return_value = run
@@ -93,7 +106,19 @@ def _mock_repos(
         llm_traces if llm_traces is not None else []
     )
 
-    return run_repo, event_repo, receipt_repo, artifact_repo, llm_trace_repo
+    retrieval_trace_repo = MagicMock()
+    retrieval_trace_repo.list_by_run.return_value = (
+        retrieval_traces if retrieval_traces is not None else []
+    )
+
+    return (
+        run_repo,
+        event_repo,
+        receipt_repo,
+        artifact_repo,
+        llm_trace_repo,
+        retrieval_trace_repo,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -110,9 +135,15 @@ class TestAssembleBundleCompleteRun:
         receipt = _make_receipt("run-1")
         artifacts = [_make_artifact("run-1")]
         llm_traces = [_make_llm_trace("run-1")]
-        run_repo, event_repo, receipt_repo, artifact_repo, llm_trace_repo = _mock_repos(
-            run, events, receipt, artifacts, llm_traces
-        )
+        retrieval_traces = [_make_retrieval_trace("run-1")]
+        (
+            run_repo,
+            event_repo,
+            receipt_repo,
+            artifact_repo,
+            llm_trace_repo,
+            retrieval_trace_repo,
+        ) = _mock_repos(run, events, receipt, artifacts, llm_traces, retrieval_traces)
 
         bundle = assemble_bundle(
             "run-1",
@@ -121,6 +152,7 @@ class TestAssembleBundleCompleteRun:
             receipt_repo,
             artifact_repo,
             llm_trace_repo,
+            retrieval_trace_repo,
         )
 
         assert bundle.run == run
@@ -128,6 +160,7 @@ class TestAssembleBundleCompleteRun:
         assert bundle.receipt == receipt
         assert bundle.artifacts == artifacts
         assert bundle.llm_traces == llm_traces
+        assert bundle.retrieval_traces == retrieval_traces
         assert bundle.projection == run.current_projection
 
 
@@ -142,9 +175,14 @@ class TestBundleMetadataFields:
 
         run = _make_run()
         events = [_make_event("run-1", seq=1)]
-        run_repo, event_repo, receipt_repo, _artifact_repo, _llm_trace_repo = _mock_repos(
-            run, events, None
-        )
+        (
+            run_repo,
+            event_repo,
+            receipt_repo,
+            _artifact_repo,
+            _llm_trace_repo,
+            _retrieval_trace_repo,
+        ) = _mock_repos(run, events, None)
 
         before = datetime.now(timezone.utc)
         bundle = assemble_bundle("run-1", run_repo, event_repo, receipt_repo)
@@ -166,9 +204,14 @@ class TestBundleEventsOrderedBySeq:
         run = _make_run()
         # list_by_run returns events in seq order per spec
         events = [_make_event("run-1", seq=i) for i in range(1, 4)]
-        run_repo, event_repo, receipt_repo, _artifact_repo, _llm_trace_repo = _mock_repos(
-            run, events, None
-        )
+        (
+            run_repo,
+            event_repo,
+            receipt_repo,
+            _artifact_repo,
+            _llm_trace_repo,
+            _retrieval_trace_repo,
+        ) = _mock_repos(run, events, None)
 
         bundle = assemble_bundle("run-1", run_repo, event_repo, receipt_repo)
 
@@ -211,9 +254,14 @@ class TestBundleNoReceipt:
 
         run = _make_run()
         events = [_make_event("run-1", seq=1)]
-        run_repo, event_repo, receipt_repo, _artifact_repo, _llm_trace_repo = _mock_repos(
-            run, events, None
-        )
+        (
+            run_repo,
+            event_repo,
+            receipt_repo,
+            _artifact_repo,
+            _llm_trace_repo,
+            _retrieval_trace_repo,
+        ) = _mock_repos(run, events, None)
 
         bundle = assemble_bundle("run-1", run_repo, event_repo, receipt_repo)
 
@@ -231,9 +279,14 @@ class TestBundleNoProjection:
 
         run = _make_run(projection=None)
         events = [_make_event("run-1", seq=1)]
-        run_repo, event_repo, receipt_repo, _artifact_repo, _llm_trace_repo = _mock_repos(
-            run, events, None
-        )
+        (
+            run_repo,
+            event_repo,
+            receipt_repo,
+            _artifact_repo,
+            _llm_trace_repo,
+            _retrieval_trace_repo,
+        ) = _mock_repos(run, events, None)
 
         bundle = assemble_bundle("run-1", run_repo, event_repo, receipt_repo)
 
@@ -249,7 +302,14 @@ class TestBundleUnknownRun:
     def test_bundle_unknown_run(self):
         from app.core.bundle import BundleError, assemble_bundle
 
-        run_repo, event_repo, receipt_repo, _artifact_repo, _llm_trace_repo = _mock_repos(run=None)
+        (
+            run_repo,
+            event_repo,
+            receipt_repo,
+            _artifact_repo,
+            _llm_trace_repo,
+            _retrieval_trace_repo,
+        ) = _mock_repos(run=None)
 
         with pytest.raises(BundleError, match="Run not found"):
             assemble_bundle("nonexistent", run_repo, event_repo, receipt_repo)
@@ -265,9 +325,14 @@ class TestBundleNoEvents:
         from app.core.bundle import BundleError, assemble_bundle
 
         run = _make_run()
-        run_repo, event_repo, receipt_repo, _artifact_repo, _llm_trace_repo = _mock_repos(
-            run, events=[], receipt=None
-        )
+        (
+            run_repo,
+            event_repo,
+            receipt_repo,
+            _artifact_repo,
+            _llm_trace_repo,
+            _retrieval_trace_repo,
+        ) = _mock_repos(run, events=[], receipt=None)
 
         with pytest.raises(BundleError, match="No events found"):
             assemble_bundle("run-1", run_repo, event_repo, receipt_repo)

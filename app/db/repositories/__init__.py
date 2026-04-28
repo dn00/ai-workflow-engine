@@ -6,6 +6,7 @@ from app.db.repositories.base import (
     AbstractEventRepository,
     AbstractLLMTraceRepository,
     AbstractReceiptRepository,
+    AbstractRetrievalTraceRepository,
     AbstractReviewRepository,
     AbstractRunRepository,
     enable_sqlite_fk_pragma,
@@ -13,6 +14,7 @@ from app.db.repositories.base import (
 from app.db.repositories.event_repository import SQLiteEventRepository
 from app.db.repositories.llm_trace_repository import SQLiteLLMTraceRepository
 from app.db.repositories.receipt_repository import SQLiteReceiptRepository
+from app.db.repositories.retrieval_trace_repository import SQLiteRetrievalTraceRepository
 from app.db.repositories.review_repository import SQLiteReviewRepository
 from app.db.repositories.run_repository import SQLiteRunRepository
 
@@ -23,11 +25,13 @@ __all__ = [
     "AbstractLLMTraceRepository",
     "AbstractReviewRepository",
     "AbstractReceiptRepository",
+    "AbstractRetrievalTraceRepository",
     "SQLiteRunRepository",
     "SQLiteArtifactRepository",
     "SQLiteEventRepository",
     "SQLiteLLMTraceRepository",
     "SQLiteReviewRepository",
     "SQLiteReceiptRepository",
+    "SQLiteRetrievalTraceRepository",
     "enable_sqlite_fk_pragma",
 ]

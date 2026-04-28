@@ -13,11 +13,13 @@ from app.db.repositories.base import (
     AbstractArtifactRepository,
     AbstractEventRepository,
     AbstractLLMTraceRepository,
+    AbstractRetrievalTraceRepository,
     AbstractReviewRepository,
     AbstractRunRepository,
     enable_sqlite_fk_pragma,
 )
 from app.observability.llm_traces import LLMTrace
+from app.retrieval.traces import RetrievalTrace
 
 # ---------------------------------------------------------------------------
 # AC Tests
@@ -52,6 +54,12 @@ class TestLLMTraceRepoAbcNotInstantiable:
     def test_cannot_instantiate_abstract_llm_trace_repository(self) -> None:
         with pytest.raises(TypeError):
             AbstractLLMTraceRepository()  # type: ignore[abstract]
+
+
+class TestRetrievalTraceRepoAbcNotInstantiable:
+    def test_cannot_instantiate_abstract_retrieval_trace_repository(self) -> None:
+        with pytest.raises(TypeError):
+            AbstractRetrievalTraceRepository()  # type: ignore[abstract]
 
 
 class TestMethodSignaturesUseDomainModels:
@@ -145,6 +153,22 @@ class TestMethodSignaturesUseDomainModels:
         }
         for method_name, expected in hints.items():
             method = getattr(AbstractLLMTraceRepository, method_name)
+            annotations = inspect.get_annotations(method)
+            for param, expected_type in expected.items():
+                assert param in annotations, (
+                    f"{method_name} missing annotation for '{param}'"
+                )
+                assert annotations[param] == expected_type, (
+                    f"{method_name}.{param}: expected {expected_type}, got {annotations[param]}"
+                )
+
+    def test_retrieval_trace_repo_signatures_use_pydantic_models(self) -> None:
+        hints = {
+            "create": {"trace": RetrievalTrace, "return": RetrievalTrace},
+            "list_by_run": {"run_id": str, "return": list[RetrievalTrace]},
+        }
+        for method_name, expected in hints.items():
+            method = getattr(AbstractRetrievalTraceRepository, method_name)
             annotations = inspect.get_annotations(method)
             for param, expected_type in expected.items():
                 assert param in annotations, (

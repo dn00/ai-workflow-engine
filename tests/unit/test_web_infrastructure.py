@@ -11,6 +11,7 @@ from app.db.repositories.base import (
     AbstractArtifactRepository,
     AbstractLLMTraceRepository,
     AbstractReceiptRepository,
+    AbstractRetrievalTraceRepository,
     AbstractReviewRepository,
 )
 from app.main import create_app
@@ -56,10 +57,12 @@ def test_app_state_exposes_receipt_and_review_repos(client: TestClient):
     assert hasattr(app.state, "review_repo")
     assert hasattr(app.state, "artifact_repo")
     assert hasattr(app.state, "llm_trace_repo")
+    assert hasattr(app.state, "retrieval_trace_repo")
     assert isinstance(app.state.receipt_repo, AbstractReceiptRepository)
     assert isinstance(app.state.review_repo, AbstractReviewRepository)
     assert isinstance(app.state.artifact_repo, AbstractArtifactRepository)
     assert isinstance(app.state.llm_trace_repo, AbstractLLMTraceRepository)
+    assert isinstance(app.state.retrieval_trace_repo, AbstractRetrievalTraceRepository)
 
 
 # ---------------------------------------------------------------------------

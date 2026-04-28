@@ -92,3 +92,18 @@ class LLMTraceRow(Base):
     error_type: Mapped[str | None] = mapped_column(String, nullable=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class RetrievalTraceRow(Base):
+    __tablename__ = "retrieval_traces"
+
+    trace_id: Mapped[str] = mapped_column(String, primary_key=True)
+    run_id: Mapped[str | None] = mapped_column(ForeignKey("runs.run_id"), nullable=True)
+    workflow_type: Mapped[str] = mapped_column(String, nullable=False)
+    query: Mapped[str] = mapped_column(Text, nullable=False)
+    top_k: Mapped[int] = mapped_column(Integer, nullable=False)
+    filters_json: Mapped[dict] = mapped_column(JSON, nullable=False)
+    retrieved_chunk_ids_json: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    sufficient: Mapped[bool] = mapped_column(nullable=False)
+    reason: Mapped[str | None] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

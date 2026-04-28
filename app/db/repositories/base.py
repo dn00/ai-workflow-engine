@@ -10,6 +10,7 @@ from app.core.enums import ReviewDecision, RunStatus
 from app.core.models import Event, ReviewTask, Run
 from app.core.receipts.models import Receipt
 from app.observability.llm_traces import LLMTrace
+from app.retrieval.traces import RetrievalTrace
 
 
 class AbstractRunRepository(ABC):
@@ -88,6 +89,16 @@ class AbstractLLMTraceRepository(ABC):
 
     @abstractmethod
     def list_by_run(self, run_id: str) -> list[LLMTrace]: ...
+
+
+class AbstractRetrievalTraceRepository(ABC):
+    """Abstract base class for retrieval trace persistence operations."""
+
+    @abstractmethod
+    def create(self, trace: RetrievalTrace) -> RetrievalTrace: ...
+
+    @abstractmethod
+    def list_by_run(self, run_id: str) -> list[RetrievalTrace]: ...
 
 
 def enable_sqlite_fk_pragma(engine: Engine) -> None:

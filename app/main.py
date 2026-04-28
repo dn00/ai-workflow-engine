@@ -11,6 +11,7 @@ from app.db.repositories import (
     SQLiteEventRepository,
     SQLiteLLMTraceRepository,
     SQLiteReceiptRepository,
+    SQLiteRetrievalTraceRepository,
     SQLiteReviewRepository,
     SQLiteRunRepository,
     enable_sqlite_fk_pragma,
@@ -43,6 +44,7 @@ def create_app(
         receipt_repo = SQLiteReceiptRepository(sf)
         artifact_repo = SQLiteArtifactRepository(sf)
         llm_trace_repo = SQLiteLLMTraceRepository(sf)
+        retrieval_trace_repo = SQLiteRetrievalTraceRepository(sf)
 
         # Create adapters
         effect_adapter = SimulatedEffectAdapter()
@@ -75,6 +77,7 @@ def create_app(
         fastapi_app.state.review_repo = review_repo
         fastapi_app.state.artifact_repo = artifact_repo
         fastapi_app.state.llm_trace_repo = llm_trace_repo
+        fastapi_app.state.retrieval_trace_repo = retrieval_trace_repo
 
         yield
 

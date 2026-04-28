@@ -94,7 +94,7 @@ make lint     # uv run --extra dev ruff check + format check
 make format   # uv run --extra dev ruff format + fix
 ```
 
-The current verified baseline is `487 passed, 1 warning` using `make test`.
+The current verified baseline is `510 passed, 1 warning` using `make test`.
 The current eval baseline is `7/7 passed` using `make eval`.
 
 ## Project Structure
@@ -109,6 +109,7 @@ app/
   workflows/          # Workflow modules (access_request, invoice_intake)
   effects/            # Effect adapters (simulated)
   llm/                # LLM adapters (mock, CLI via claude -p)
+  retrieval/          # Document loading, chunking, retrieval, prompt context
   db/                 # SQLite persistence + abstract repositories
 tests/
   unit/               # Domain logic tests (parser, validator, policy, reducer)
