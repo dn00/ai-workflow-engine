@@ -9,6 +9,7 @@ from app.core.artifacts.models import Artifact
 from app.core.enums import ReviewDecision, RunStatus
 from app.core.models import Event, ReviewTask, Run
 from app.core.receipts.models import Receipt
+from app.observability.llm_traces import LLMTrace
 
 
 class AbstractRunRepository(ABC):
@@ -74,6 +75,19 @@ class AbstractArtifactRepository(ABC):
 
     @abstractmethod
     def list_by_run(self, run_id: str) -> list[Artifact]: ...
+
+
+class AbstractLLMTraceRepository(ABC):
+    """Abstract base class for LLM trace persistence operations."""
+
+    @abstractmethod
+    def create(self, trace: LLMTrace) -> LLMTrace: ...
+
+    @abstractmethod
+    def list_recent(self, limit: int = 100) -> list[LLMTrace]: ...
+
+    @abstractmethod
+    def list_by_run(self, run_id: str) -> list[LLMTrace]: ...
 
 
 def enable_sqlite_fk_pragma(engine: Engine) -> None:

@@ -5,10 +5,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api.routes import runs_router
+from app.api.routes import observability_router, runs_router
 from app.db.repositories import (
     SQLiteArtifactRepository,
     SQLiteEventRepository,
+    SQLiteLLMTraceRepository,
     SQLiteReceiptRepository,
     SQLiteReviewRepository,
     SQLiteRunRepository,
@@ -41,6 +42,7 @@ def create_app(
         review_repo = SQLiteReviewRepository(sf)
         receipt_repo = SQLiteReceiptRepository(sf)
         artifact_repo = SQLiteArtifactRepository(sf)
+        llm_trace_repo = SQLiteLLMTraceRepository(sf)
 
         # Create adapters
         effect_adapter = SimulatedEffectAdapter()
@@ -62,6 +64,7 @@ def create_app(
             llm_adapter=adapter,
             receipt_repo=receipt_repo,
             artifact_repo=artifact_repo,
+            llm_trace_repo=llm_trace_repo,
         )
 
         # Store on app.state for dependency injection
@@ -71,11 +74,15 @@ def create_app(
         fastapi_app.state.receipt_repo = receipt_repo
         fastapi_app.state.review_repo = review_repo
         fastapi_app.state.artifact_repo = artifact_repo
+        fastapi_app.state.llm_trace_repo = llm_trace_repo
 
         yield
 
     application = FastAPI(title="AI Workflow Engine", lifespan=lifespan)
     application.include_router(runs_router, prefix="/runs", tags=["runs"])
+    application.include_router(
+        observability_router, prefix="/observability", tags=["observability"]
+    )
     application.include_router(web_router, prefix="/ui", tags=["web"])
     return application
 

@@ -6,6 +6,7 @@ from app.core.runners.local_runner import LocalRunner
 from app.db.repositories.base import (
     AbstractArtifactRepository,
     AbstractEventRepository,
+    AbstractLLMTraceRepository,
     AbstractReceiptRepository,
     AbstractReviewRepository,
     AbstractRunRepository,
@@ -40,3 +41,8 @@ def get_review_repo(request: Request) -> AbstractReviewRepository:
 def get_artifact_repo(request: Request) -> AbstractArtifactRepository:
     """Retrieve the artifact repository from app state."""
     return request.app.state.artifact_repo
+
+
+def get_llm_trace_repo(request: Request) -> AbstractLLMTraceRepository:
+    """Retrieve the LLM trace repository from app state."""
+    return request.app.state.llm_trace_repo

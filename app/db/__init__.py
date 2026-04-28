@@ -1,14 +1,24 @@
 """Public API for the app.db persistence package."""
 
-from app.db.models import ArtifactRow, Base, EventRow, ReceiptRow, ReviewRow, RunRow
+from app.db.models import (
+    ArtifactRow,
+    Base,
+    EventRow,
+    LLMTraceRow,
+    ReceiptRow,
+    ReviewRow,
+    RunRow,
+)
 from app.db.repositories import (
     AbstractArtifactRepository,
     AbstractEventRepository,
+    AbstractLLMTraceRepository,
     AbstractReceiptRepository,
     AbstractReviewRepository,
     AbstractRunRepository,
     SQLiteArtifactRepository,
     SQLiteEventRepository,
+    SQLiteLLMTraceRepository,
     SQLiteReceiptRepository,
     SQLiteReviewRepository,
     SQLiteRunRepository,
@@ -20,6 +30,7 @@ __all__ = [
     "Base",
     "ArtifactRow",
     "EventRow",
+    "LLMTraceRow",
     "ReceiptRow",
     "ReviewRow",
     "RunRow",
@@ -29,11 +40,13 @@ __all__ = [
     "AbstractRunRepository",
     "AbstractArtifactRepository",
     "AbstractEventRepository",
+    "AbstractLLMTraceRepository",
     "AbstractReviewRepository",
     "AbstractReceiptRepository",
     "SQLiteRunRepository",
     "SQLiteArtifactRepository",
     "SQLiteEventRepository",
+    "SQLiteLLMTraceRepository",
     "SQLiteReviewRepository",
     "SQLiteReceiptRepository",
     "enable_sqlite_fk_pragma",

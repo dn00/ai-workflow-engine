@@ -564,6 +564,140 @@ def test_start_run_stores_proposal_and_normalized_artifacts():
     assert artifact_repo.create.call_args_list[0].args[0].source_receipt_id
 
 
+def test_start_run_records_llm_trace_for_approved_run():
+    run_repo, event_repo, review_repo, receipt_repo, _events = _make_repos()
+    trace_repo = MagicMock()
+    adapter = _make_effect_adapter()
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(
+        run_repo,
+        event_repo,
+        review_repo,
+        adapter,
+        llm_adapter,
+        receipt_repo,
+        llm_trace_repo=trace_repo,
+    )
+    wf = _make_workflow_module(
+        parse_success=True, validation_valid=True, policy_status="approved"
+    )
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        runner.start_run("input", RunMode.LIVE)
+
+    trace_repo.create.assert_called_once()
+    trace = trace_repo.create.call_args.args[0]
+    assert trace.workflow_type == "access_request"
+    assert trace.prompt_version == "1.0"
+    assert trace.parse_success is True
+    assert trace.policy_status == "approved"
+    assert trace.latency_ms >= 0
+    assert trace.input_chars == len("input")
+
+
+def test_start_run_records_llm_trace_for_parse_failure():
+    run_repo, event_repo, review_repo, receipt_repo, _events = _make_repos()
+    trace_repo = MagicMock()
+    adapter = _make_effect_adapter()
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(
+        run_repo,
+        event_repo,
+        review_repo,
+        adapter,
+        llm_adapter,
+        receipt_repo,
+        llm_trace_repo=trace_repo,
+    )
+    wf = _make_workflow_module(parse_success=False)
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        runner.start_run("input", RunMode.LIVE)
+
+    trace_repo.create.assert_called_once()
+    trace = trace_repo.create.call_args.args[0]
+    assert trace.parse_success is False
+    assert trace.parse_error == "bad json"
+
+
+def test_start_run_records_validation_errors_without_policy_status():
+    run_repo, event_repo, review_repo, receipt_repo, _events = _make_repos()
+    trace_repo = MagicMock()
+    adapter = _make_effect_adapter()
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(
+        run_repo,
+        event_repo,
+        review_repo,
+        adapter,
+        llm_adapter,
+        receipt_repo,
+        llm_trace_repo=trace_repo,
+    )
+    wf = _make_workflow_module(parse_success=True, validation_valid=False)
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        runner.start_run("input", RunMode.LIVE)
+
+    trace = trace_repo.create.call_args.args[0]
+    assert trace.parse_success is True
+    assert trace.policy_status is None
+    assert trace.reason_codes == ["validation error"]
+
+
+def test_start_run_continues_when_llm_trace_write_fails():
+    run_repo, event_repo, review_repo, receipt_repo, _events = _make_repos()
+    trace_repo = MagicMock()
+    trace_repo.create.side_effect = RuntimeError("trace db down")
+    adapter = _make_effect_adapter()
+    llm_adapter = MockLLMAdapter()
+    runner = LocalRunner(
+        run_repo,
+        event_repo,
+        review_repo,
+        adapter,
+        llm_adapter,
+        receipt_repo,
+        llm_trace_repo=trace_repo,
+    )
+    wf = _make_workflow_module(
+        parse_success=True, validation_valid=True, policy_status="approved"
+    )
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        result = runner.start_run("input", RunMode.LIVE)
+
+    assert result.projection.status == RunStatus.COMPLETED
+    trace_repo.create.assert_called_once()
+
+
+def test_start_run_records_llm_trace_for_adapter_error():
+    run_repo, event_repo, review_repo, receipt_repo, _events = _make_repos()
+    trace_repo = MagicMock()
+    adapter = _make_effect_adapter()
+    llm_adapter = MagicMock()
+    llm_adapter.generate_proposal.side_effect = LLMAdapterError("down")
+    runner = LocalRunner(
+        run_repo,
+        event_repo,
+        review_repo,
+        adapter,
+        llm_adapter,
+        receipt_repo,
+        llm_trace_repo=trace_repo,
+    )
+    wf = _make_workflow_module()
+
+    with patch("app.core.runners.local_runner.get_workflow", return_value=wf):
+        with pytest.raises(RunnerError):
+            runner.start_run("input", RunMode.LIVE)
+
+    trace_repo.create.assert_called_once()
+    trace = trace_repo.create.call_args.args[0]
+    assert trace.error_type == "LLMAdapterError"
+    assert trace.error_message == "down"
+
+
 # ---------------------------------------------------------------------------
 # LLM adapter error raised as RunnerError
 # ---------------------------------------------------------------------------

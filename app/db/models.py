@@ -72,3 +72,23 @@ class ArtifactRow(Base):
         ForeignKey("receipts.receipt_id"), nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class LLMTraceRow(Base):
+    __tablename__ = "llm_traces"
+
+    trace_id: Mapped[str] = mapped_column(String, primary_key=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("runs.run_id"), nullable=False)
+    workflow_type: Mapped[str] = mapped_column(String, nullable=False)
+    prompt_version: Mapped[str | None] = mapped_column(String, nullable=True)
+    model_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    latency_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    input_chars: Mapped[int] = mapped_column(Integer, nullable=False)
+    response_chars: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    parse_success: Mapped[bool | None] = mapped_column(nullable=True)
+    parse_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    policy_status: Mapped[str | None] = mapped_column(String, nullable=True)
+    reason_codes_json: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    error_type: Mapped[str | None] = mapped_column(String, nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

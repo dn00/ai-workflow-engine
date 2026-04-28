@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.api.dependencies import (
     get_artifact_repo,
     get_event_repo,
+    get_llm_trace_repo,
     get_receipt_repo,
     get_run_repo,
     get_runner,
@@ -28,6 +29,7 @@ from app.core.runners.models import RunResult
 from app.db.repositories.base import (
     AbstractArtifactRepository,
     AbstractEventRepository,
+    AbstractLLMTraceRepository,
     AbstractReceiptRepository,
     AbstractRunRepository,
 )
@@ -183,11 +185,17 @@ def get_run_bundle(
     event_repo: AbstractEventRepository = Depends(get_event_repo),
     receipt_repo: AbstractReceiptRepository = Depends(get_receipt_repo),
     artifact_repo: AbstractArtifactRepository = Depends(get_artifact_repo),
+    llm_trace_repo: AbstractLLMTraceRepository = Depends(get_llm_trace_repo),
 ):
     """Export replay bundle for a run (spec §25)."""
     try:
         bundle = assemble_bundle(
-            run_id, run_repo, event_repo, receipt_repo, artifact_repo
+            run_id,
+            run_repo,
+            event_repo,
+            receipt_repo,
+            artifact_repo,
+            llm_trace_repo,
         )
     except BundleError as exc:
         status = 404 if "not found" in str(exc).lower() else 400

@@ -94,7 +94,7 @@ make lint     # uv run --extra dev ruff check + format check
 make format   # uv run --extra dev ruff format + fix
 ```
 
-The current verified baseline is `470 passed, 1 warning` using `make test`.
+The current verified baseline is `487 passed, 1 warning` using `make test`.
 The current eval baseline is `7/7 passed` using `make eval`.
 
 ## Project Structure

@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from app.core.artifacts.models import Artifact
 from app.core.models import Event, Run
 from app.core.receipts.models import Receipt
+from app.observability.llm_traces import LLMTrace
 
 
 class ReplayBundle(BaseModel):
@@ -18,6 +19,7 @@ class ReplayBundle(BaseModel):
     events: list[Event]
     receipt: Receipt | None = None
     artifacts: list[Artifact] = Field(default_factory=list)
+    llm_traces: list[LLMTrace] = Field(default_factory=list)
     projection: dict | None = None
 
 

@@ -6,6 +6,8 @@ to workflow modules via the registry.
 """
 
 import json
+import logging
+import time
 from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
@@ -23,16 +25,20 @@ from app.core.replay.models import ReplayResult
 from app.db.repositories.base import (
     AbstractArtifactRepository,
     AbstractEventRepository,
+    AbstractLLMTraceRepository,
     AbstractReceiptRepository,
     AbstractReviewRepository,
     AbstractRunRepository,
 )
 from app.effects.base import AbstractEffectAdapter, check_effect_preconditions
 from app.llm.base import AbstractLLMAdapter, LLMAdapterError
+from app.observability.llm_traces import LLMTrace
 from app.workflows.registry import get_workflow
 
 from .base import AbstractRunner, RunnerError
 from .models import RunResult
+
+logger = logging.getLogger(__name__)
 
 
 class LocalRunner(AbstractRunner):
@@ -47,6 +53,7 @@ class LocalRunner(AbstractRunner):
         llm_adapter: AbstractLLMAdapter,
         receipt_repo: AbstractReceiptRepository,
         artifact_repo: AbstractArtifactRepository | None = None,
+        llm_trace_repo: AbstractLLMTraceRepository | None = None,
     ) -> None:
         self._run_repo = run_repo
         self._event_repo = event_repo
@@ -55,6 +62,7 @@ class LocalRunner(AbstractRunner):
         self._llm_adapter = llm_adapter
         self._receipt_repo = receipt_repo
         self._artifact_repo = artifact_repo
+        self._llm_trace_repo = llm_trace_repo
 
     # ------------------------------------------------------------------
     # Private helpers
@@ -129,6 +137,36 @@ class LocalRunner(AbstractRunner):
                 source_receipt_id=source_receipt_id,
             )
         )
+
+    def _record_llm_trace(
+        self,
+        trace: LLMTrace,
+        *,
+        parse_success: bool | None = None,
+        parse_error: str | None = None,
+        policy_status: str | None = None,
+        reason_codes: list[str] | None = None,
+        error_type: str | None = None,
+        error_message: str | None = None,
+    ) -> None:
+        """Persist LLM trace metadata when observability storage is configured."""
+        if self._llm_trace_repo is None:
+            return
+        try:
+            self._llm_trace_repo.create(
+                trace.model_copy(
+                    update={
+                        "parse_success": parse_success,
+                        "parse_error": parse_error,
+                        "policy_status": policy_status,
+                        "reason_codes": reason_codes or [],
+                        "error_type": error_type,
+                        "error_message": error_message,
+                    }
+                )
+            )
+        except Exception as exc:
+            logger.warning("Failed to persist LLM trace for run %s: %s", trace.run_id, exc)
 
     def _run_result(
         self, run_id: str, review_task: ReviewTask | None = None
@@ -208,12 +246,36 @@ class LocalRunner(AbstractRunner):
         seq += 1
 
         # 2. Call LLM adapter
+        llm_started = time.perf_counter()
         try:
             llm_response = self._llm_adapter.generate_proposal(
                 input_text, run.workflow_type
             )
         except LLMAdapterError as exc:
+            latency_ms = round((time.perf_counter() - llm_started) * 1000)
+            self._record_llm_trace(
+                LLMTrace(
+                    run_id=run_id,
+                    workflow_type=run.workflow_type,
+                    latency_ms=latency_ms,
+                    input_chars=len(input_text),
+                    error_type=type(exc).__name__,
+                    error_message=str(exc),
+                ),
+                error_type=type(exc).__name__,
+                error_message=str(exc),
+            )
             raise RunnerError(f"LLM proposal generation failed: {exc}") from exc
+        latency_ms = round((time.perf_counter() - llm_started) * 1000)
+        llm_trace = LLMTrace(
+            run_id=run_id,
+            workflow_type=run.workflow_type,
+            prompt_version=llm_response.prompt_version,
+            model_id=llm_response.model_id,
+            latency_ms=latency_ms,
+            input_chars=len(input_text),
+            response_chars=len(llm_response.raw_response),
+        )
 
         # 3. Store receipt before parsing (INV-1.2)
         receipt = Receipt(
@@ -230,6 +292,11 @@ class LocalRunner(AbstractRunner):
         # 4. Parse proposal from LLM response (not raw input_text)
         parse_result = wf.parse_proposal(llm_response.raw_response)
         if not parse_result.success:
+            self._record_llm_trace(
+                llm_trace,
+                parse_success=False,
+                parse_error=parse_result.error,
+            )
             # proposal.parse_failed → exit
             self._emit(
                 run_id, seq, EventType.PROPOSAL_PARSE_FAILED,
@@ -271,6 +338,11 @@ class LocalRunner(AbstractRunner):
         validation_result = wf.validate_proposal(parse_result.proposal, normalized)
 
         if not validation_result.is_valid:
+            self._record_llm_trace(
+                llm_trace,
+                parse_success=True,
+                reason_codes=[str(error) for error in validation_result.errors],
+            )
             # validation.failed → exit
             self._emit(
                 run_id, seq, EventType.VALIDATION_FAILED,
@@ -295,6 +367,12 @@ class LocalRunner(AbstractRunner):
             normalized,
             validation_result,
             policy_version=version_info.policy_version,
+        )
+        self._record_llm_trace(
+            llm_trace,
+            parse_success=True,
+            policy_status=decision.status,
+            reason_codes=[str(code) for code in decision.reason_codes],
         )
 
         # 7. decision.committed

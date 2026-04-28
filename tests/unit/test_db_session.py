@@ -31,6 +31,7 @@ class TestInitDbCreatesTables:
         assert table_names == [
             "artifacts",
             "events",
+            "llm_traces",
             "receipts",
             "reviews",
             "runs",
@@ -61,6 +62,7 @@ class TestInitDbIdempotent:
         assert table_names == [
             "artifacts",
             "events",
+            "llm_traces",
             "receipts",
             "reviews",
             "runs",
@@ -73,6 +75,7 @@ class TestModuleExports:
             ArtifactRow,
             Base,
             EventRow,
+            LLMTraceRow,
             ReviewRow,
             RunRow,
             get_engine,
@@ -85,6 +88,7 @@ class TestModuleExports:
         assert ArtifactRow is not None
         assert RunRow is not None
         assert EventRow is not None
+        assert LLMTraceRow is not None
         assert ReviewRow is not None
         assert get_engine is not None
         assert get_session_factory is not None
