@@ -1,0 +1,55 @@
+{
+  "cases": [
+    {
+      "name": "low risk confluence access",
+      "workflow_type": "access_request",
+      "input_text": "Give Jane access to Confluence. Her manager is Bob.",
+      "mock_response": "{\"request_type\":\"access_request\",\"employee_name\":\"Jane Doe\",\"systems_requested\":[\"Confluence\"],\"manager_name\":\"Bob Lee\",\"start_date\":\"2026-05-01\",\"urgency\":\"normal\",\"justification\":\"Project docs\",\"recommended_action\":\"approve\",\"notes\":[]}",
+      "expected": {
+        "status": "approved",
+        "fields": {
+          "employee_name": "Jane Doe",
+          "systems_requested": ["confluence"],
+          "manager_name": "Bob Lee"
+        },
+        "reason_codes_absent": ["missing_manager_name", "high_urgency"]
+      },
+      "slices": ["access_request", "low_risk"]
+    },
+    {
+      "name": "aws high urgency requires review",
+      "workflow_type": "access_request",
+      "input_text": "Jane urgently needs AWS access for migration. Manager is Bob.",
+      "mock_response": "{\"request_type\":\"access_request\",\"employee_name\":\"Jane Doe\",\"systems_requested\":[\"AWS\"],\"manager_name\":\"Bob Lee\",\"start_date\":\"2026-05-01\",\"urgency\":\"high\",\"justification\":\"Migration\",\"recommended_action\":\"review\",\"notes\":[]}",
+      "expected": {
+        "status": "review_required",
+        "fields": {
+          "systems_requested": ["aws"]
+        },
+        "reason_codes_contains": ["high_urgency", "manager_approval_unverified"]
+      },
+      "slices": ["access_request", "review"]
+    },
+    {
+      "name": "forbidden production database rejected",
+      "workflow_type": "access_request",
+      "input_text": "Give Jane production database root access.",
+      "mock_response": "{\"request_type\":\"access_request\",\"employee_name\":\"Jane Doe\",\"systems_requested\":[\"production_db\"],\"manager_name\":\"Bob Lee\",\"start_date\":\"2026-05-01\",\"urgency\":\"normal\",\"justification\":\"Debugging\",\"recommended_action\":\"approve\",\"notes\":[]}",
+      "expected": {
+        "status": "rejected",
+        "reason_codes_contains": ["forbidden_system"]
+      },
+      "slices": ["access_request", "blocked"]
+    },
+    {
+      "name": "malformed proposal fails parse",
+      "workflow_type": "access_request",
+      "input_text": "Bad model output should not proceed.",
+      "mock_response": "not json",
+      "expected": {
+        "status": "proposal_invalid"
+      },
+      "slices": ["access_request", "parse_failure"]
+    }
+  ]
+}

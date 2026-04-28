@@ -89,11 +89,13 @@ See [docs/architecture.md](docs/architecture.md) for the full design including s
 
 ```bash
 make test     # uv run --extra dev pytest -q
+make eval     # deterministic workflow golden-case evals
 make lint     # uv run --extra dev ruff check + format check
 make format   # uv run --extra dev ruff format + fix
 ```
 
-The current verified baseline is `466 passed, 1 warning` using `make test`.
+The current verified baseline is `470 passed, 1 warning` using `make test`.
+The current eval baseline is `7/7 passed` using `make eval`.
 
 ## Project Structure
 

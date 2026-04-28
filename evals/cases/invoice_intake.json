@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "name": "small known vendor invoice approved",
+      "workflow_type": "invoice_intake",
+      "input_text": "Small Acme invoice for services.",
+      "mock_response": "{\"request_type\":\"invoice_intake\",\"vendor_name\":\"Acme Corp\",\"invoice_number\":\"INV-100\",\"invoice_date\":\"2026-05-01\",\"currency\":\"usd\",\"line_items\":[{\"description\":\"Services\",\"amount\":1200}],\"total\":1200,\"notes\":[]}",
+      "expected": {
+        "status": "approved",
+        "fields": {
+          "vendor_name": "Acme Corp",
+          "invoice_number": "INV-100",
+          "currency": "USD",
+          "total": 1200.0
+        },
+        "reason_codes_absent": ["above_auto_approve_threshold", "unknown_vendor"]
+      },
+      "slices": ["invoice_intake", "low_risk"]
+    },
+    {
+      "name": "large invoice requires review",
+      "workflow_type": "invoice_intake",
+      "input_text": "Snowflake invoice is above threshold.",
+      "mock_response": "{\"request_type\":\"invoice_intake\",\"vendor_name\":\"Snowflake\",\"invoice_number\":\"SNO-200\",\"invoice_date\":\"2026-05-01\",\"currency\":\"USD\",\"line_items\":[{\"description\":\"Compute\",\"amount\":10000}],\"total\":10000,\"notes\":[]}",
+      "expected": {
+        "status": "review_required",
+        "fields": {
+          "vendor_name": "Snowflake",
+          "total": 10000.0
+        },
+        "reason_codes_contains": ["above_auto_approve_threshold"]
+      },
+      "slices": ["invoice_intake", "review"]
+    },
+    {
+      "name": "flagged vendor rejected",
+      "workflow_type": "invoice_intake",
+      "input_text": "Invoice from flagged vendor.",
+      "mock_response": "{\"request_type\":\"invoice_intake\",\"vendor_name\":\"Offshore Consulting Ltd\",\"invoice_number\":\"OFF-1\",\"invoice_date\":\"2026-05-01\",\"currency\":\"USD\",\"line_items\":[{\"description\":\"Services\",\"amount\":500}],\"total\":500,\"notes\":[]}",
+      "expected": {
+        "status": "rejected",
+        "reason_codes_contains": ["flagged_vendor"]
+      },
+      "slices": ["invoice_intake", "blocked"]
+    }
+  ]
+}

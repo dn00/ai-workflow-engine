@@ -1,4 +1,4 @@
-.PHONY: test lint format demo export-bundle install
+.PHONY: test lint format demo eval export-bundle install
 
 test:
 	uv run --extra dev pytest -q
@@ -10,6 +10,9 @@ lint:
 format:
 	uv run --extra dev ruff format .
 	uv run --extra dev ruff check --fix .
+
+eval:
+	uv run --extra dev python scripts/run_evals.py
 
 install:
 	uv sync --extra dev
