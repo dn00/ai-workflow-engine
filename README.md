@@ -2,7 +2,7 @@
 
 **Deterministic AI Workflow Automation**
 
-A production-shaped AI workflow automation system that converts unstructured access requests into safe, replayable, auditable actions. The core thesis: **LLMs propose, deterministic code decides** — LLM output is treated as untrusted input, gated by validation, policy rules, and human review before any side effects execute.
+An extensible, production-shaped AI workflow automation system for turning unstructured access requests into validated, reviewable, and auditable workflows. LLM outputs are treated as untrusted input and gated through schema validation, policy checks, audit logging, and human review before execution, with a design that supports adding new request types, policies, and handlers over time.
 
 ## Quick Start
 
