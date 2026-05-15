@@ -2,7 +2,7 @@
 
 **Deterministic AI Workflow Automation**
 
-An extensible, production-shaped AI workflow automation system for turning unstructured access requests into validated, reviewable, and auditable workflows. LLM outputs are treated as untrusted input and gated through schema validation, policy checks, audit logging, and human review before execution, with a design that supports adding new request types, policies, and handlers over time.
+A production-shaped AI workflow automation system that converts unstructured requests into safe, replayable, auditable actions. The core thesis: **LLMs propose, deterministic code decides** — LLM output is treated as untrusted input, gated by validation, policy rules, and human review before any side effects execute. Supports multiple workflow types including access requests, invoice processing, and FHIR R4 prior authorization.
 
 ## Quick Start
 
@@ -50,12 +50,26 @@ Every step emits an event to an append-only log. The current state is derived by
 
 ## Demo Scenarios
 
+### Access Request
+
 | Scenario | Input | Outcome |
 |----------|-------|---------|
 | **Auto-approve** | Single low-risk system (e.g. Confluence), manager present | Policy approves, effect simulated |
 | **Human review** | High urgency or known system (e.g. AWS) | Pauses at `review_required`, resumes after human decision |
 | **Rejection** | Forbidden system (e.g. production_db) | Blocked at validation, no effects |
 | **Replay** | Any completed run | Reconstructs from events, verifies projection matches |
+
+### Prior Authorization (FHIR R4)
+
+| Scenario | Input | Outcome |
+|----------|-------|---------|
+| **Routine imaging** | MRI knee, known payer, valid ICD-10/CPT, conservative treatment documented | Auto-approved, FHIR Claim + ClaimResponse generated |
+| **High-cost surgery** | Total knee arthroplasty, medical necessity documented | `review_required` → clinical reviewer decides |
+| **Emergent bypass** | STEMI, emergent cardiac catheterization | Auto-approved regardless of other factors |
+| **Missing necessity** | Surgery request, no prior treatments documented | `review_required` (missing_medical_necessity) |
+| **Invalid codes** | Malformed ICD-10 or CPT codes | Rejected at validation |
+
+Sample clinical notes are in `data/prior_auth/`. The LLM extracts structured clinical facts (ICD-10 diagnoses, CPT procedures, medical necessity justification) from unstructured referral text, then deterministic validation and policy rules decide the authorization outcome.
 
 See [docs/demo-script.md](docs/demo-script.md) for step-by-step API and UI walkthroughs.
 
@@ -94,8 +108,8 @@ make lint     # uv run --extra dev ruff check + format check
 make format   # uv run --extra dev ruff format + fix
 ```
 
-The current verified baseline is `536 passed, 1 warning` using `make test`.
-The current eval baseline is `10/10 passed` using `make eval`.
+The current verified baseline is `624 passed, 1 warning` using `make test`.
+The current eval baseline is `17/17 passed` using `make eval`.
 
 ## Project Structure
 
@@ -106,7 +120,7 @@ app/
   web/                # Jinja2 web UI routes
   templates/          # HTML templates
   core/               # Shared kernel: models, enums, reducer, replay, runners
-  workflows/          # Workflow modules (access_request, invoice_intake, invoice_exception)
+  workflows/          # Workflow modules (access_request, invoice_intake, invoice_exception, prior_auth)
   effects/            # Effect adapters (simulated)
   llm/                # LLM adapters (mock, CLI via claude -p)
   retrieval/          # Document loading, chunking, retrieval, prompt context
