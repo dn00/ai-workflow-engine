@@ -1,0 +1,14 @@
+AUTH REQUEST
+
+Patient: David Kim, MRN PAT-005
+Insurance: Blue Cross Blue Shield
+
+Provider: Dr. Lisa Wong
+NPI: 4444444444
+
+Requesting: Lumbar spinal fusion (CPT 22630)
+Dx: Lumbar disc degeneration (M51.36)
+Service date: 2027-09-01
+
+Notes: Patient has back pain. Requesting surgical consult and
+authorization for fusion procedure.

@@ -1,0 +1,8 @@
+Ortho referral - Dr. Chen NPI 1234567890
+
+Pt 62yo F c/o R knee pain x 6 wks. Hx OA. Failed PT x 6 wks, NSAIDs (naproxen).
+PE: medial JL tenderness, ROM 90deg flex, mild effusion. WB XR shows JSN.
+Dx M17.11. Req MRI R knee w/o contrast r/o meniscal tear.
+
+Ins: Aetna (AETNA-001). MRN: PAT-006.
+Svc date: 2027-06-15. Urgency: routine.

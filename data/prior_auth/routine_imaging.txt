@@ -1,0 +1,33 @@
+REFERRAL FOR AUTHORIZATION
+
+Patient: Maria Garcia (MRN: PAT-001)
+DOB: 1958-03-14
+Insurance: Aetna (ID: AETNA-001)
+
+Referring Provider: Dr. Sarah Chen, MD
+NPI: 1234567890
+Specialty: Orthopedic Surgery
+
+Date of Referral: 2027-05-20
+Requested Service Date: 2027-06-15
+
+CLINICAL SUMMARY:
+Pt is 69yo F c/o R knee pain x 6 wks. Hx of OA. Physical exam shows medial
+joint line tenderness, ROM limited to 90 degrees flexion, mild effusion.
+Weight-bearing XR shows joint space narrowing.
+
+Dx: Primary osteoarthritis, right knee (M17.11)
+
+REQUEST:
+MRI right knee without contrast (CPT 73721) to evaluate for meniscal tear
+and assess cartilage loss prior to surgical planning.
+
+PRIOR TREATMENTS:
+- Physical therapy x 6 weeks (completed, minimal improvement)
+- Naproxen 500mg BID x 4 weeks
+- Activity modification
+
+MEDICAL NECESSITY:
+Conservative management has failed to provide adequate pain relief.
+MRI needed to evaluate internal derangement and guide treatment planning.
+Patient reports increasing difficulty with ambulation and ADLs.

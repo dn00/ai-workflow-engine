@@ -1,0 +1,25 @@
+EMERGENT AUTHORIZATION REQUEST
+
+Patient: Eleanor Thompson (MRN: PAT-003)
+DOB: 1948-11-30
+Insurance: Cigna (ID: CIGNA-001)
+
+Attending: Dr. Maria Santos, MD
+NPI: 5555555555
+Specialty: Interventional Cardiology
+
+CLINICAL PRESENTATION:
+78yo F presenting to ED with acute chest pain, diaphoresis, and dyspnea.
+12-lead ECG shows ST elevation in leads V1-V4 consistent with anterior
+STEMI. Troponin I elevated at 2.4 ng/mL (normal <0.04). Hemodynamically
+stable, BP 138/82.
+
+Dx: Acute ST elevation myocardial infarction, anterior wall (I21.0)
+
+EMERGENT PROCEDURE REQUIRED:
+Left heart catheterization (CPT 93458) with possible PCI.
+
+Door-to-balloon target: <90 minutes. Patient being prepped for cath lab.
+
+URGENCY: EMERGENT — delay in authorization will result in increased
+myocardial damage and potential mortality.

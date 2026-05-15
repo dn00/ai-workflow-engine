@@ -1,0 +1,108 @@
+{
+  "cases": [
+    {
+      "name": "routine imaging auto-approved",
+      "workflow_type": "prior_auth",
+      "input_text": "Pt 69yo F c/o R knee pain x 6 wks. Dx M17.11. Req MRI R knee w/o contrast. Failed PT x 6 wks, naproxen 500mg BID. Provider: Dr. Sarah Chen NPI 1234567890. Payer: Aetna AETNA-001. Patient PAT-001. Service date 2027-06-15.",
+      "mock_response": "{\"request_type\":\"prior_auth\",\"patient_id\":\"PAT-001\",\"provider_name\":\"Dr. Sarah Chen\",\"provider_npi\":\"1234567890\",\"payer_name\":\"Aetna\",\"payer_id\":\"AETNA-001\",\"diagnoses\":[{\"code\":\"M17.11\",\"display\":\"Primary osteoarthritis, right knee\",\"rank\":\"primary\"}],\"procedures\":[{\"code\":\"73721\",\"display\":\"MRI knee without contrast\",\"quantity\":1}],\"service_date\":\"2027-06-15\",\"urgency\":\"routine\",\"clinical_justification\":\"Persistent right knee pain x 6 weeks, unresponsive to physical therapy and NSAIDs. ROM limited to 90 degrees flexion.\",\"prior_treatments\":[\"physical therapy x 6 weeks\",\"naproxen 500mg BID x 4 weeks\"],\"notes\":[]}",
+      "expected": {
+        "status": "approved",
+        "fields": {
+          "patient_id": "PAT-001",
+          "payer_name": "Aetna",
+          "urgency": "routine",
+          "all_codes_valid": true,
+          "has_medical_necessity": true
+        },
+        "reason_codes_contains": [],
+        "reason_codes_absent": ["restricted_payer", "high_cost_clinical_review", "invalid_clinical_codes"]
+      },
+      "slices": ["prior_auth", "auto_approve", "imaging"]
+    },
+    {
+      "name": "high-cost knee replacement requires clinical review",
+      "workflow_type": "prior_auth",
+      "input_text": "72yo M severe R knee OA, KL grade IV. Failed 14 months conservative mgmt. Requesting TKA. Provider: Dr. James Park NPI 9876543210. Payer: UnitedHealthcare. Patient PAT-002.",
+      "mock_response": "{\"request_type\":\"prior_auth\",\"patient_id\":\"PAT-002\",\"provider_name\":\"Dr. James Park\",\"provider_npi\":\"9876543210\",\"payer_name\":\"UnitedHealthcare\",\"payer_id\":\"UHC-001\",\"diagnoses\":[{\"code\":\"M17.11\",\"display\":\"Primary osteoarthritis, right knee\",\"rank\":\"primary\"}],\"procedures\":[{\"code\":\"27447\",\"display\":\"Total knee arthroplasty\",\"quantity\":1}],\"service_date\":\"2027-08-01\",\"urgency\":\"routine\",\"clinical_justification\":\"Severe osteoarthritis right knee, Kellgren-Lawrence grade IV. Failed 12 months of conservative management including PT, NSAIDs, injections.\",\"prior_treatments\":[\"physical therapy x 12 weeks\",\"NSAIDs x 6 months\",\"corticosteroid injection x 3\",\"hyaluronic acid injection\"],\"notes\":[]}",
+      "expected": {
+        "status": "review_required",
+        "fields": {
+          "patient_id": "PAT-002",
+          "payer_name": "UnitedHealthcare",
+          "has_medical_necessity": true
+        },
+        "reason_codes_contains": ["high_cost_clinical_review"],
+        "reason_codes_absent": ["high_cost_no_necessity"]
+      },
+      "slices": ["prior_auth", "review", "high_cost"]
+    },
+    {
+      "name": "emergent cardiac bypass auto-approved",
+      "workflow_type": "prior_auth",
+      "input_text": "78yo F ED presentation acute STEMI anterior wall. Emergent cardiac cath required. Dr. Santos NPI 5555555555. Cigna. Patient PAT-003.",
+      "mock_response": "{\"request_type\":\"prior_auth\",\"patient_id\":\"PAT-003\",\"provider_name\":\"Dr. Maria Santos\",\"provider_npi\":\"5555555555\",\"payer_name\":\"Cigna\",\"payer_id\":\"CIGNA-001\",\"diagnoses\":[{\"code\":\"I21.0\",\"display\":\"Acute ST elevation MI of anterior wall\",\"rank\":\"primary\"}],\"procedures\":[{\"code\":\"93458\",\"display\":\"Left heart catheterization\",\"quantity\":1}],\"service_date\":\"2027-06-15\",\"urgency\":\"emergent\",\"clinical_justification\":\"STEMI, emergent cardiac catheterization required. Door-to-balloon target under 90 minutes.\",\"prior_treatments\":[],\"notes\":[]}",
+      "expected": {
+        "status": "approved",
+        "fields": {
+          "urgency": "emergent"
+        },
+        "reason_codes_contains": ["emergent_bypass"],
+        "reason_codes_absent": ["missing_medical_necessity", "standard_clinical_review"]
+      },
+      "slices": ["prior_auth", "auto_approve", "emergent"]
+    },
+    {
+      "name": "missing medical necessity requires review",
+      "workflow_type": "prior_auth",
+      "input_text": "Patient has back pain. Requesting lumbar fusion. Dr. Wong NPI 4444444444. BCBS. Patient PAT-005.",
+      "mock_response": "{\"request_type\":\"prior_auth\",\"patient_id\":\"PAT-005\",\"provider_name\":\"Dr. Lisa Wong\",\"provider_npi\":\"4444444444\",\"payer_name\":\"Blue Cross Blue Shield\",\"payer_id\":\"BCBS-001\",\"diagnoses\":[{\"code\":\"M51.36\",\"display\":\"Lumbar disc degeneration\",\"rank\":\"primary\"}],\"procedures\":[{\"code\":\"22630\",\"display\":\"Lumbar spinal fusion\",\"quantity\":1}],\"service_date\":\"2027-09-01\",\"urgency\":\"routine\",\"clinical_justification\":\"Patient has back pain.\",\"prior_treatments\":[],\"notes\":[\"No prior conservative treatments documented\"]}",
+      "expected": {
+        "status": "review_required",
+        "fields": {
+          "has_medical_necessity": false
+        },
+        "reason_codes_contains": ["high_cost_no_necessity"],
+        "reason_codes_absent": ["high_cost_clinical_review"]
+      },
+      "slices": ["prior_auth", "review", "missing_necessity"]
+    },
+    {
+      "name": "restricted payer requires review",
+      "workflow_type": "prior_auth",
+      "input_text": "Medicare patient needs routine knee MRI. Dr. Chen NPI 1234567890. Patient PAT-007.",
+      "mock_response": "{\"request_type\":\"prior_auth\",\"patient_id\":\"PAT-007\",\"provider_name\":\"Dr. Sarah Chen\",\"provider_npi\":\"1234567890\",\"payer_name\":\"Medicare\",\"payer_id\":\"MCR-001\",\"diagnoses\":[{\"code\":\"M17.11\",\"display\":\"Primary osteoarthritis, right knee\",\"rank\":\"primary\"}],\"procedures\":[{\"code\":\"73721\",\"display\":\"MRI knee without contrast\",\"quantity\":1}],\"service_date\":\"2027-06-15\",\"urgency\":\"routine\",\"clinical_justification\":\"Knee pain unresponsive to conservative treatment.\",\"prior_treatments\":[\"physical therapy x 6 weeks\",\"NSAIDs x 4 weeks\"],\"notes\":[]}",
+      "expected": {
+        "status": "review_required",
+        "fields": {
+          "payer_name": "Medicare",
+          "has_medical_necessity": true
+        },
+        "reason_codes_contains": ["restricted_payer"],
+        "reason_codes_absent": ["unknown_payer"]
+      },
+      "slices": ["prior_auth", "review", "payer"]
+    },
+    {
+      "name": "invalid codes rejected at validation",
+      "workflow_type": "prior_auth",
+      "input_text": "Patient needs procedure. Invalid codes provided.",
+      "mock_response": "{\"request_type\":\"prior_auth\",\"patient_id\":\"PAT-004\",\"provider_name\":\"Dr. Test\",\"provider_npi\":\"1111111111\",\"payer_name\":\"Aetna\",\"payer_id\":\"AETNA-002\",\"diagnoses\":[{\"code\":\"BADCODE\",\"display\":\"Invalid diagnosis\",\"rank\":\"primary\"}],\"procedures\":[{\"code\":\"ABC\",\"display\":\"Invalid procedure\",\"quantity\":1}],\"service_date\":\"2027-06-15\",\"urgency\":\"routine\",\"clinical_justification\":\"Testing invalid codes.\",\"prior_treatments\":[\"physical therapy\"],\"notes\":[]}",
+      "expected": {
+        "status": "proposal_invalid",
+        "reason_codes_contains": ["invalid_icd10_code_0", "invalid_cpt_code_0"]
+      },
+      "slices": ["prior_auth", "rejected", "validation"]
+    },
+    {
+      "name": "always-review procedure triggers review",
+      "workflow_type": "prior_auth",
+      "input_text": "Requesting unlisted nervous system procedure for chronic pain. Dr. Chen. Aetna. Patient PAT-008.",
+      "mock_response": "{\"request_type\":\"prior_auth\",\"patient_id\":\"PAT-008\",\"provider_name\":\"Dr. Sarah Chen\",\"provider_npi\":\"1234567890\",\"payer_name\":\"Aetna\",\"payer_id\":\"AETNA-001\",\"diagnoses\":[{\"code\":\"G89.29\",\"display\":\"Other chronic pain\",\"rank\":\"primary\"}],\"procedures\":[{\"code\":\"64999\",\"display\":\"Unlisted procedure, nervous system\",\"quantity\":1}],\"service_date\":\"2027-07-01\",\"urgency\":\"routine\",\"clinical_justification\":\"Chronic pain unresponsive to multiple treatments.\",\"prior_treatments\":[\"physical therapy\",\"gabapentin\",\"nerve block x 2\"],\"notes\":[]}",
+      "expected": {
+        "status": "review_required",
+        "reason_codes_contains": ["always_review_procedure"]
+      },
+      "slices": ["prior_auth", "review", "always_review"]
+    }
+  ]
+}

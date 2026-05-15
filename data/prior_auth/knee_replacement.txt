@@ -1,0 +1,38 @@
+PRIOR AUTHORIZATION REQUEST
+
+Patient: Robert Williams (MRN: PAT-002)
+DOB: 1955-08-22
+Insurance: UnitedHealthcare (ID: UHC-001)
+
+Requesting Provider: Dr. James Park, MD
+NPI: 9876543210
+Specialty: Orthopedic Surgery
+
+Requested Service Date: 2027-08-01
+
+CLINICAL HISTORY:
+72yo M with severe R knee OA, Kellgren-Lawrence grade IV. Pt has failed
+extensive conservative management over 14 months. Significant varus
+deformity noted. Bone-on-bone contact on weight-bearing films. Pain
+score 8/10, unable to walk > 1 block.
+
+Dx: Primary osteoarthritis, right knee (M17.11)
+Secondary: BMI 28.3 (E66.01)
+
+REQUESTED PROCEDURE:
+Total knee arthroplasty, right (CPT 27447)
+
+PRIOR TREATMENTS ATTEMPTED:
+- Physical therapy x 12 weeks (3 separate courses over 14 months)
+- NSAIDs: naproxen, meloxicam (6+ months, GI side effects)
+- Corticosteroid injections x 3 (last injection 2027-01, minimal relief)
+- Hyaluronic acid injection series (completed, no sustained benefit)
+- Knee unloader brace x 4 months
+- Weight management counseling
+
+MEDICAL NECESSITY:
+Patient has exhausted all appropriate conservative treatment options.
+Radiographic evidence demonstrates end-stage osteoarthritis with complete
+loss of joint space. Functional status severely limited — unable to perform
+basic ADLs without significant pain. Surgical intervention is medically
+necessary to restore mobility and quality of life.
