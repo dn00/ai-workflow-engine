@@ -2,7 +2,7 @@
 
 import re
 
-VALID_ICD10_PATTERN = re.compile(r"^[A-Z]\d{2}(\.\d{1,4})?$")
+VALID_ICD10_PATTERN = re.compile(r"^[A-Z]\d{2}(\.[0-9A-Z]{1,4})?$")
 VALID_CPT_PATTERN = re.compile(r"^\d{5}$")
 VALID_NPI_PATTERN = re.compile(r"^\d{10}$")
 
